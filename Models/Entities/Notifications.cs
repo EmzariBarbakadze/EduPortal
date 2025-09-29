@@ -1,7 +1,10 @@
-﻿namespace EduPortal.Models.Entities
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace EduPortal.Models.Entities
 {
     public class Notifications
     {
+        [Key]
         public int NotificationId { get; set; }
 
         public int UserId { get; set; }
