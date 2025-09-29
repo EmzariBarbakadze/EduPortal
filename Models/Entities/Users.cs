@@ -42,5 +42,11 @@ namespace EduPortal.Models.Entities
         public List<UserAchievements> UserAchievements { get; set; }
 
         public List<ExceptionLogs> ExceptionLogs { get; set; }
+
+        public List<ExamSchedule> ExamSchedules { get; set; }
+
+        public List<Courses> Course { get; set; }
+
+        public List<Enrollments> Enrollments { get; set; }
     }
 }
