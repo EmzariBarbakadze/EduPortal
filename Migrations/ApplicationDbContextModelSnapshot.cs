@@ -383,6 +383,32 @@ namespace EduPortal.Migrations
                     b.HasKey("ActivityTypeId");
 
                     b.ToTable("Inf_ActivityTypes");
+
+                    b.HasData(
+                        new
+                        {
+                            ActivityTypeId = 1,
+                            DescrEng = "Lecture",
+                            DescrLocal = "ლექცია"
+                        },
+                        new
+                        {
+                            ActivityTypeId = 2,
+                            DescrEng = "Working Group",
+                            DescrLocal = "სემინარი"
+                        },
+                        new
+                        {
+                            ActivityTypeId = 3,
+                            DescrEng = "Practicum",
+                            DescrLocal = "პრაქტიკული"
+                        },
+                        new
+                        {
+                            ActivityTypeId = 4,
+                            DescrEng = "Lab",
+                            DescrLocal = "ლაბორატორიული"
+                        });
                 });
 
             modelBuilder.Entity("EduPortal.Models.Entities.Inf_CourseCategories", b =>
@@ -396,9 +422,6 @@ namespace EduPortal.Migrations
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("DescrEng")
                         .IsRequired()
@@ -414,6 +437,48 @@ namespace EduPortal.Migrations
                     b.HasKey("CourseCategoryId");
 
                     b.ToTable("Inf_CourseCategories");
+
+                    b.HasData(
+                        new
+                        {
+                            CourseCategoryId = 1,
+                            Code = "CS",
+                            DescrEng = "Computer Science",
+                            DescrLocal = "კომპიუტერული მეცნიერება",
+                            IsActive = true
+                        },
+                        new
+                        {
+                            CourseCategoryId = 2,
+                            Code = "MaTh",
+                            DescrEng = "Mathematics",
+                            DescrLocal = "მათემატიკა",
+                            IsActive = true
+                        },
+                        new
+                        {
+                            CourseCategoryId = 3,
+                            Code = "SC",
+                            DescrEng = "Natural Science",
+                            DescrLocal = "საბუნებისმეტყველო მეცნიერება",
+                            IsActive = true
+                        },
+                        new
+                        {
+                            CourseCategoryId = 4,
+                            Code = "GE",
+                            DescrEng = "General Education",
+                            DescrLocal = "ზოგადი განათლება",
+                            IsActive = true
+                        },
+                        new
+                        {
+                            CourseCategoryId = 5,
+                            Code = "Free",
+                            DescrEng = "Free Credits",
+                            DescrLocal = "თავისუფალი კრედიტები",
+                            IsActive = true
+                        });
                 });
 
             modelBuilder.Entity("EduPortal.Models.Entities.Inf_CourseLocationTypes", b =>
@@ -438,6 +503,29 @@ namespace EduPortal.Migrations
                     b.HasKey("LocationTypeId");
 
                     b.ToTable("Inf_CourseLocationTypes");
+
+                    b.HasData(
+                        new
+                        {
+                            LocationTypeId = 1,
+                            DescrEng = "On Site",
+                            DescrLocal = "ადგილზე",
+                            IsActive = true
+                        },
+                        new
+                        {
+                            LocationTypeId = 2,
+                            DescrEng = "Online",
+                            DescrLocal = "ონლაინ",
+                            IsActive = true
+                        },
+                        new
+                        {
+                            LocationTypeId = 3,
+                            DescrEng = "Hybrid",
+                            DescrLocal = "ჰიბრიდული",
+                            IsActive = true
+                        });
                 });
 
             modelBuilder.Entity("EduPortal.Models.Entities.Inf_ErrorCodes", b =>
@@ -462,6 +550,99 @@ namespace EduPortal.Migrations
                     b.HasKey("Code");
 
                     b.ToTable("Inf_ErrorCodes");
+
+                    b.HasData(
+                        new
+                        {
+                            Code = 1000,
+                            DescrEng = "General system error",
+                            DescrLocal = "ზოგადი შეცდომა",
+                            IsActive = true
+                        },
+                        new
+                        {
+                            Code = 1001,
+                            DescrEng = "Data not found",
+                            DescrLocal = "მონაცემები ვერ მოიძებნა",
+                            IsActive = true
+                        },
+                        new
+                        {
+                            Code = 1002,
+                            DescrEng = "Invalid input data",
+                            DescrLocal = "არასწორი შეყვანილი მონაცემები",
+                            IsActive = true
+                        },
+                        new
+                        {
+                            Code = 1003,
+                            DescrEng = "User not found",
+                            DescrLocal = "მომხმარებელი ვერ მოიძებნა",
+                            IsActive = true
+                        },
+                        new
+                        {
+                            Code = 1004,
+                            DescrEng = "Invalid password",
+                            DescrLocal = "პაროლი არასწორია",
+                            IsActive = true
+                        },
+                        new
+                        {
+                            Code = 1005,
+                            DescrEng = "Access denied",
+                            DescrLocal = "წვდომა აკრძალულია",
+                            IsActive = true
+                        },
+                        new
+                        {
+                            Code = 1006,
+                            DescrEng = "Session expired",
+                            DescrLocal = "სესია დასრულებულია",
+                            IsActive = true
+                        },
+                        new
+                        {
+                            Code = 1007,
+                            DescrEng = "Unauthorized request",
+                            DescrLocal = "მოთხოვნა არ არის ავტორიზებული",
+                            IsActive = true
+                        },
+                        new
+                        {
+                            Code = 1008,
+                            DescrEng = "Data processing failed",
+                            DescrLocal = "მონაცემების დამუშავება ვერ მოხერხდა",
+                            IsActive = true
+                        },
+                        new
+                        {
+                            Code = 1009,
+                            DescrEng = "Server temporarily unavailable",
+                            DescrLocal = "სერვერი დროებით მიუწვდომელია",
+                            IsActive = true
+                        },
+                        new
+                        {
+                            Code = 1010,
+                            DescrEng = "Course not found",
+                            DescrLocal = "კურსი ვერ მოიძებნა",
+                            IsActive = true
+                        },
+                        new
+                        {
+                            Code = 1011,
+                            DescrEng = "Exam not found",
+                            DescrLocal = "გამოცდა ვერ მოიძებნა",
+                            IsActive = true
+                        },
+                        new
+                        {
+                            Code = 1012,
+                            DescrEng = "User already registered",
+                            DescrLocal = "მომხმარებელს უკვე აქვს რეგისტრაცია",
+                            IsActive = true
+                        });
                 });
 
             modelBuilder.Entity("EduPortal.Models.Entities.Inf_ExamTypes", b =>
@@ -486,6 +667,29 @@ namespace EduPortal.Migrations
                     b.HasKey("ExamTypeId");
 
                     b.ToTable("Inf_ExamTypes");
+
+                    b.HasData(
+                        new
+                        {
+                            ExamTypeId = 1,
+                            DescrEng = "Quiz",
+                            DescrLocal = "ქვიზი",
+                            IsActive = true
+                        },
+                        new
+                        {
+                            ExamTypeId = 2,
+                            DescrEng = "Midterm",
+                            DescrLocal = "შუალედური",
+                            IsActive = true
+                        },
+                        new
+                        {
+                            ExamTypeId = 3,
+                            DescrEng = "Final Exam",
+                            DescrLocal = "ფინალური გამოცდა",
+                            IsActive = true
+                        });
                 });
 
             modelBuilder.Entity("EduPortal.Models.Entities.Inf_NotificationTypes", b =>
@@ -510,6 +714,57 @@ namespace EduPortal.Migrations
                     b.HasKey("NotificationTypeId");
 
                     b.ToTable("Inf_NotificationTypes");
+
+                    b.HasData(
+                        new
+                        {
+                            NotificationTypeId = 1,
+                            DescrEng = "New course added",
+                            DescrLocal = "ახალი კურსი დამატებულია",
+                            IsActive = true
+                        },
+                        new
+                        {
+                            NotificationTypeId = 2,
+                            DescrEng = "Exam reminder",
+                            DescrLocal = "გამოცდის დრო ახლოვდება",
+                            IsActive = true
+                        },
+                        new
+                        {
+                            NotificationTypeId = 3,
+                            DescrEng = "New announcement",
+                            DescrLocal = "ახალი განცხადება/შეტყობინება",
+                            IsActive = true
+                        },
+                        new
+                        {
+                            NotificationTypeId = 4,
+                            DescrEng = "New course material",
+                            DescrLocal = "კურსში ახალი მასალა აიტვირთა",
+                            IsActive = true
+                        },
+                        new
+                        {
+                            NotificationTypeId = 5,
+                            DescrEng = "Grade published",
+                            DescrLocal = "შეფასება გამოქვეყნდა",
+                            IsActive = true
+                        },
+                        new
+                        {
+                            NotificationTypeId = 6,
+                            DescrEng = "New message received",
+                            DescrLocal = "ახალი შეტყობინება მიღებულია",
+                            IsActive = true
+                        },
+                        new
+                        {
+                            NotificationTypeId = 7,
+                            DescrEng = "Assignment due reminder",
+                            DescrLocal = "დავალების ვადა ახლოვდება",
+                            IsActive = true
+                        });
                 });
 
             modelBuilder.Entity("EduPortal.Models.Entities.Inf_RestrictionLevels", b =>
@@ -534,6 +789,15 @@ namespace EduPortal.Migrations
                     b.HasKey("RestrictionLevelId");
 
                     b.ToTable("Inf_RestrictionLevels");
+
+                    b.HasData(
+                        new
+                        {
+                            RestrictionLevelId = 1,
+                            DescrEng = "Test Mode",
+                            DescrLocal = "სატესტო რეჟიმი",
+                            IsActive = true
+                        });
                 });
 
             modelBuilder.Entity("EduPortal.Models.Entities.Inf_UserStatuses", b =>
@@ -558,6 +822,50 @@ namespace EduPortal.Migrations
                     b.HasKey("StatusId");
 
                     b.ToTable("Inf_UserStatuses");
+
+                    b.HasData(
+                        new
+                        {
+                            StatusId = 1,
+                            DescrEng = "Active",
+                            DescrLocal = "აქტიური",
+                            IsActive = true
+                        },
+                        new
+                        {
+                            StatusId = 2,
+                            DescrEng = "Inactive",
+                            DescrLocal = "არაქტიური",
+                            IsActive = true
+                        },
+                        new
+                        {
+                            StatusId = 3,
+                            DescrEng = "Suspended",
+                            DescrLocal = "შეჩერებული",
+                            IsActive = true
+                        },
+                        new
+                        {
+                            StatusId = 4,
+                            DescrEng = "Blocked",
+                            DescrLocal = "დაბლოკილი",
+                            IsActive = true
+                        },
+                        new
+                        {
+                            StatusId = 5,
+                            DescrEng = "Registered (Unconfirmed)",
+                            DescrLocal = "დარეგისტრირებული, დაუდასტურებელი",
+                            IsActive = true
+                        },
+                        new
+                        {
+                            StatusId = 6,
+                            DescrEng = "Deleted",
+                            DescrLocal = "წაშლილი",
+                            IsActive = true
+                        });
                 });
 
             modelBuilder.Entity("EduPortal.Models.Entities.Inf_Weekdays", b =>
@@ -579,6 +887,50 @@ namespace EduPortal.Migrations
                     b.HasKey("WeekDayId");
 
                     b.ToTable("Inf_Weekdays");
+
+                    b.HasData(
+                        new
+                        {
+                            WeekDayId = 1,
+                            DescrEng = "Monday",
+                            DescrLocal = "ორშაბათი"
+                        },
+                        new
+                        {
+                            WeekDayId = 2,
+                            DescrEng = "Tuesday",
+                            DescrLocal = "სამშაბათი"
+                        },
+                        new
+                        {
+                            WeekDayId = 3,
+                            DescrEng = "Wednesday",
+                            DescrLocal = "ოთხშაბათი"
+                        },
+                        new
+                        {
+                            WeekDayId = 4,
+                            DescrEng = "Thursday",
+                            DescrLocal = "ხუთშაბათი"
+                        },
+                        new
+                        {
+                            WeekDayId = 5,
+                            DescrEng = "Friday",
+                            DescrLocal = "პარასკევი"
+                        },
+                        new
+                        {
+                            WeekDayId = 6,
+                            DescrEng = "Saturday",
+                            DescrLocal = "შაბათი"
+                        },
+                        new
+                        {
+                            WeekDayId = 7,
+                            DescrEng = "Sunday",
+                            DescrLocal = "კვირა"
+                        });
                 });
 
             modelBuilder.Entity("EduPortal.Models.Entities.Notifications", b =>
@@ -642,6 +994,36 @@ namespace EduPortal.Migrations
                     b.HasKey("RoleId");
 
                     b.ToTable("Roles");
+
+                    b.HasData(
+                        new
+                        {
+                            RoleId = 1,
+                            DescrEng = "Student",
+                            DescrLocal = "სტუდენტი",
+                            IsActive = true
+                        },
+                        new
+                        {
+                            RoleId = 2,
+                            DescrEng = "Lecturer",
+                            DescrLocal = "ლექტორი",
+                            IsActive = true
+                        },
+                        new
+                        {
+                            RoleId = 3,
+                            DescrEng = "Admin",
+                            DescrLocal = "ადმინისტრატორი",
+                            IsActive = true
+                        },
+                        new
+                        {
+                            RoleId = 4,
+                            DescrEng = "SuperAdmin",
+                            DescrLocal = "სუპერ ადმინისტრატორი",
+                            IsActive = true
+                        });
                 });
 
             modelBuilder.Entity("EduPortal.Models.Entities.UserAchievements", b =>

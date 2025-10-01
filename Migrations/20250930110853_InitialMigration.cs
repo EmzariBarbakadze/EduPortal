@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace EduPortal.Migrations
 {
     /// <inheritdoc />
@@ -51,7 +53,6 @@ namespace EduPortal.Migrations
                     Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DescrLocal = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DescrEng = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -203,7 +204,7 @@ namespace EduPortal.Migrations
                         column: x => x.Inf_UserStatusesStatusId,
                         principalTable: "Inf_UserStatuses",
                         principalColumn: "StatusId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -231,13 +232,13 @@ namespace EduPortal.Migrations
                         column: x => x.CourseCategoriesCourseCategoryId,
                         principalTable: "Inf_CourseCategories",
                         principalColumn: "CourseCategoryId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Courses_Users_UsersUserId",
                         column: x => x.UsersUserId,
                         principalTable: "Users",
                         principalColumn: "UserId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -262,13 +263,13 @@ namespace EduPortal.Migrations
                         column: x => x.Inf_ErrorCodesCode,
                         principalTable: "Inf_ErrorCodes",
                         principalColumn: "Code",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_ExceptionLogs_Users_UsersUserId",
                         column: x => x.UsersUserId,
                         principalTable: "Users",
                         principalColumn: "UserId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -293,13 +294,13 @@ namespace EduPortal.Migrations
                         column: x => x.NotificationTypesNotificationTypeId,
                         principalTable: "Inf_NotificationTypes",
                         principalColumn: "NotificationTypeId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Notifications_Users_UsersUserId",
                         column: x => x.UsersUserId,
                         principalTable: "Users",
                         principalColumn: "UserId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -323,13 +324,13 @@ namespace EduPortal.Migrations
                         column: x => x.AchievementsAchievementId,
                         principalTable: "Achievements",
                         principalColumn: "AchievementId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_UserAchievements_Users_UsersUserId",
                         column: x => x.UsersUserId,
                         principalTable: "Users",
                         principalColumn: "UserId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -353,13 +354,13 @@ namespace EduPortal.Migrations
                         column: x => x.RolesRoleId,
                         principalTable: "Roles",
                         principalColumn: "RoleId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_UsersRoles_Users_UsersUserId",
                         column: x => x.UsersUserId,
                         principalTable: "Users",
                         principalColumn: "UserId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -385,13 +386,13 @@ namespace EduPortal.Migrations
                         column: x => x.Inf_RestrictionLevelsRestrictionLevelId,
                         principalTable: "Inf_RestrictionLevels",
                         principalColumn: "RestrictionLevelId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_UsersSessions_Users_UsersUserId",
                         column: x => x.UsersUserId,
                         principalTable: "Users",
                         principalColumn: "UserId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -418,13 +419,13 @@ namespace EduPortal.Migrations
                         column: x => x.CoursesCourseId,
                         principalTable: "Courses",
                         principalColumn: "CourseId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_CourseSchedules_Inf_CourseLocationTypes_CourseLocationTypesLocationTypeId",
                         column: x => x.CourseLocationTypesLocationTypeId,
                         principalTable: "Inf_CourseLocationTypes",
                         principalColumn: "LocationTypeId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -448,13 +449,13 @@ namespace EduPortal.Migrations
                         column: x => x.CoursesCourseId,
                         principalTable: "Courses",
                         principalColumn: "CourseId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Enrollments_Users_UsersUserId",
                         column: x => x.UsersUserId,
                         principalTable: "Users",
                         principalColumn: "UserId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -483,25 +484,25 @@ namespace EduPortal.Migrations
                         column: x => x.CoursesCourseId,
                         principalTable: "Courses",
                         principalColumn: "CourseId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_ExamSchedule_Inf_CourseLocationTypes_CourseLocationTypesLocationTypeId",
                         column: x => x.CourseLocationTypesLocationTypeId,
                         principalTable: "Inf_CourseLocationTypes",
                         principalColumn: "LocationTypeId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_ExamSchedule_Inf_ExamTypes_ExamTypesExamTypeId",
                         column: x => x.ExamTypesExamTypeId,
                         principalTable: "Inf_ExamTypes",
                         principalColumn: "ExamTypeId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_ExamSchedule_Users_UsersUserId",
                         column: x => x.UsersUserId,
                         principalTable: "Users",
                         principalColumn: "UserId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -531,13 +532,13 @@ namespace EduPortal.Migrations
                         column: x => x.UsersSessionsUserSessionId,
                         principalTable: "UsersSessions",
                         principalColumn: "UserSessionId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_UserTokens_Users_UsersUserId",
                         column: x => x.UsersUserId,
                         principalTable: "Users",
                         principalColumn: "UserId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -563,19 +564,19 @@ namespace EduPortal.Migrations
                         column: x => x.CourseScheduleId,
                         principalTable: "CourseSchedules",
                         principalColumn: "CourseScheduleId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_CourseScheduleAttributes_Inf_ActivityTypes_activityTypesActivityTypeId",
                         column: x => x.activityTypesActivityTypeId,
                         principalTable: "Inf_ActivityTypes",
                         principalColumn: "ActivityTypeId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_CourseScheduleAttributes_Inf_Weekdays_WeekDaysWeekDayId",
                         column: x => x.WeekDaysWeekDayId,
                         principalTable: "Inf_Weekdays",
                         principalColumn: "WeekDayId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -601,19 +602,139 @@ namespace EduPortal.Migrations
                         column: x => x.ExamScheduleId,
                         principalTable: "ExamSchedule",
                         principalColumn: "ExamScheduleId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_ExamResults_Inf_ExamTypes_ExamTypesExamTypeId",
                         column: x => x.ExamTypesExamTypeId,
                         principalTable: "Inf_ExamTypes",
                         principalColumn: "ExamTypeId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_ExamResults_Users_UsersUserId",
                         column: x => x.UsersUserId,
                         principalTable: "Users",
                         principalColumn: "UserId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.InsertData(
+                table: "Inf_ActivityTypes",
+                columns: new[] { "ActivityTypeId", "DescrEng", "DescrLocal" },
+                values: new object[,]
+                {
+                    { 1, "Lecture", "ლექცია" },
+                    { 2, "Working Group", "სემინარი" },
+                    { 3, "Practicum", "პრაქტიკული" },
+                    { 4, "Lab", "ლაბორატორიული" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Inf_CourseCategories",
+                columns: new[] { "CourseCategoryId", "Code", "DescrEng", "DescrLocal", "IsActive" },
+                values: new object[,]
+                {
+                    { 1, "CS", "Computer Science", "კომპიუტერული მეცნიერება", true },
+                    { 2, "MaTh", "Mathematics", "მათემატიკა", true },
+                    { 3, "SC", "Natural Science", "საბუნებისმეტყველო მეცნიერება", true },
+                    { 4, "GE", "General Education", "ზოგადი განათლება", true },
+                    { 5, "Free", "Free Credits", "თავისუფალი კრედიტები", true }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Inf_CourseLocationTypes",
+                columns: new[] { "LocationTypeId", "DescrEng", "DescrLocal", "IsActive" },
+                values: new object[,]
+                {
+                    { 1, "On Site", "ადგილზე", true },
+                    { 2, "Online", "ონლაინ", true },
+                    { 3, "Hybrid", "ჰიბრიდული", true }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Inf_ErrorCodes",
+                columns: new[] { "Code", "DescrEng", "DescrLocal", "IsActive" },
+                values: new object[,]
+                {
+                    { 1000, "General system error", "ზოგადი შეცდომა", true },
+                    { 1001, "Data not found", "მონაცემები ვერ მოიძებნა", true },
+                    { 1002, "Invalid input data", "არასწორი შეყვანილი მონაცემები", true },
+                    { 1003, "User not found", "მომხმარებელი ვერ მოიძებნა", true },
+                    { 1004, "Invalid password", "პაროლი არასწორია", true },
+                    { 1005, "Access denied", "წვდომა აკრძალულია", true },
+                    { 1006, "Session expired", "სესია დასრულებულია", true },
+                    { 1007, "Unauthorized request", "მოთხოვნა არ არის ავტორიზებული", true },
+                    { 1008, "Data processing failed", "მონაცემების დამუშავება ვერ მოხერხდა", true },
+                    { 1009, "Server temporarily unavailable", "სერვერი დროებით მიუწვდომელია", true },
+                    { 1010, "Course not found", "კურსი ვერ მოიძებნა", true },
+                    { 1011, "Exam not found", "გამოცდა ვერ მოიძებნა", true },
+                    { 1012, "User already registered", "მომხმარებელს უკვე აქვს რეგისტრაცია", true }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Inf_ExamTypes",
+                columns: new[] { "ExamTypeId", "DescrEng", "DescrLocal", "IsActive" },
+                values: new object[,]
+                {
+                    { 1, "Quiz", "ქვიზი", true },
+                    { 2, "Midterm", "შუალედური", true },
+                    { 3, "Final Exam", "ფინალური გამოცდა", true }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Inf_NotificationTypes",
+                columns: new[] { "NotificationTypeId", "DescrEng", "DescrLocal", "IsActive" },
+                values: new object[,]
+                {
+                    { 1, "New course added", "ახალი კურსი დამატებულია", true },
+                    { 2, "Exam reminder", "გამოცდის დრო ახლოვდება", true },
+                    { 3, "New announcement", "ახალი განცხადება/შეტყობინება", true },
+                    { 4, "New course material", "კურსში ახალი მასალა აიტვირთა", true },
+                    { 5, "Grade published", "შეფასება გამოქვეყნდა", true },
+                    { 6, "New message received", "ახალი შეტყობინება მიღებულია", true },
+                    { 7, "Assignment due reminder", "დავალების ვადა ახლოვდება", true }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Inf_RestrictionLevels",
+                columns: new[] { "RestrictionLevelId", "DescrEng", "DescrLocal", "IsActive" },
+                values: new object[] { 1, "Test Mode", "სატესტო რეჟიმი", true });
+
+            migrationBuilder.InsertData(
+                table: "Inf_UserStatuses",
+                columns: new[] { "StatusId", "DescrEng", "DescrLocal", "IsActive" },
+                values: new object[,]
+                {
+                    { 1, "Active", "აქტიური", true },
+                    { 2, "Inactive", "არაქტიური", true },
+                    { 3, "Suspended", "შეჩერებული", true },
+                    { 4, "Blocked", "დაბლოკილი", true },
+                    { 5, "Registered (Unconfirmed)", "დარეგისტრირებული, დაუდასტურებელი", true },
+                    { 6, "Deleted", "წაშლილი", true }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Inf_Weekdays",
+                columns: new[] { "WeekDayId", "DescrEng", "DescrLocal" },
+                values: new object[,]
+                {
+                    { 1, "Monday", "ორშაბათი" },
+                    { 2, "Tuesday", "სამშაბათი" },
+                    { 3, "Wednesday", "ოთხშაბათი" },
+                    { 4, "Thursday", "ხუთშაბათი" },
+                    { 5, "Friday", "პარასკევი" },
+                    { 6, "Saturday", "შაბათი" },
+                    { 7, "Sunday", "კვირა" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Roles",
+                columns: new[] { "RoleId", "DescrEng", "DescrLocal", "IsActive" },
+                values: new object[,]
+                {
+                    { 1, "Student", "სტუდენტი", true },
+                    { 2, "Lecturer", "ლექტორი", true },
+                    { 3, "Admin", "ადმინისტრატორი", true },
+                    { 4, "SuperAdmin", "სუპერ ადმინისტრატორი", true }
                 });
 
             migrationBuilder.CreateIndex(

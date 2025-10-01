@@ -6,6 +6,6 @@
 
         public string DescrEng { get; set; }
 
-        public bool IsActive { get; set; } = true;
+        public bool IsActive { get; set; }
     }
 }

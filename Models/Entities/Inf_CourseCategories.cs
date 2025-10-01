@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace EduPortal.Models.Entities
 {
-    public class Inf_CourseCategories : BaseClass4
+    public class Inf_CourseCategories : BaseClass3
     {
         [Key]
         public int CourseCategoryId { get; set; }
