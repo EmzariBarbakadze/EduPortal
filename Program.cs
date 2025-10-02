@@ -1,9 +1,11 @@
 
 using EduPortal.Data;
+using EduPortal.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using EduPortal.Interfaces;
 
 namespace EduPortal
 {
@@ -47,6 +49,8 @@ namespace EduPortal
             );
 
             builder.Services.AddAuthorization();
+
+            builder.Services.AddScoped<ITokenService, TokenService>();
 
             var app = builder.Build();
 
