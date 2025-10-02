@@ -1,4 +1,5 @@
-﻿using EduPortal.Interfaces;
+﻿using EduPortal.Data;
+using EduPortal.Interfaces;
 using EduPortal.Models.Entities;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -10,10 +11,12 @@ namespace EduPortal.Services
     public class TokenService : ITokenService
     {
         private readonly IConfiguration _config;
+        private readonly ApplicationDbContext _context;
 
-        public TokenService(IConfiguration config)
+        public TokenService(IConfiguration config, ApplicationDbContext context)
         {
             _config = config;
+            _context = context;
         }
 
         public string GenerateAccessToken(Users user, List<string> roles)
@@ -50,12 +53,32 @@ namespace EduPortal.Services
         public string GenerateRandomSecureToken()
         {
             var randomBytes = new byte[64];
-            using var rng = System.
+            using var rng = System.Security.Cryptography.RandomNumberGenerator.Create();
+            rng.GetBytes(randomBytes);
+
+            return Convert.ToBase64String(randomBytes);
         }
 
-        public string GenerateRefreshToken(int userId, string ipAdress, string deviceInfo, int? sessionId = null, int jwtId = 0)
+        public UserTokens GenerateRefreshToken(int userId, string ipAdress, string deviceInfo, int? sessionId = null, int jwtId = 0)
         {
-            throw new NotImplementedException();
+            var config = _config.GetSection("JwtSettings");
+
+            var userToken = new UserTokens
+            {
+                UserId = userId,
+                RefreshToken = GenerateRandomSecureToken(),
+                IpAdress = ipAdress,
+                JwtId = jwtId,
+                CreatedAt = DateTime.Now,
+                ExpiresAt = DateTime.Now.AddDays(double.Parse(config["RefreshTokenExpiresDays"]!)),
+                DeviceInfo = deviceInfo, 
+                SessionId = sessionId
+            };
+
+            _context.UserTokens.Add(userToken);
+            _context.SaveChanges();
+
+            return userToken;
         }
     }
 }
