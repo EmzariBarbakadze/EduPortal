@@ -46,5 +46,16 @@ namespace EduPortal.Services
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+        public string GenerateRandomSecureToken()
+        {
+            var randomBytes = new byte[64];
+            using var rng = System.
+        }
+
+        public string GenerateRefreshToken(int userId, string ipAdress, string deviceInfo, int? sessionId = null, int jwtId = 0)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

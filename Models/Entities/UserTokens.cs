@@ -19,13 +19,11 @@ namespace EduPortal.Models.Entities
 
         public DateTime ExpiresAt { get; set; }
 
-        public DateTime RewokedAt { get; set; }
+        public DateTime? RevokedAt { get; set; }
 
-        public bool IsUsed { get; set; }
+        public string? IpAdress { get; set; }
 
-        public string IpAdress { get; set; }
-
-        public string DeviceInfo { get; set; }
+        public string? DeviceInfo { get; set; }
 
         public int? SessionId { get; set; }
 

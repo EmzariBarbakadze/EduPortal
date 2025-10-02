@@ -4,6 +4,10 @@ namespace EduPortal.Interfaces
 {
     public interface ITokenService
     {
-        public string GenerateAccessToken(Users user);
+        public string GenerateAccessToken(Users user, List<string> roles);
+
+        public string GenerateRefreshToken(int userId, string ipAdress, string deviceInfo, int? sessionId = null, int jwtId = 0);
+
+        public string GenerateRandomSecureToken();
     }
 }
