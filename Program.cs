@@ -51,6 +51,7 @@ namespace EduPortal
             builder.Services.AddAuthorization();
 
             builder.Services.AddScoped<ITokenService, TokenService>();
+            builder.Services.AddScoped<IAuthService, AuthService>();
 
             var app = builder.Build();
 
