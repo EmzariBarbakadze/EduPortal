@@ -4,13 +4,13 @@ namespace EduPortal.Models.DTOs
 {
     public class UserRegisterDTO
     {
-        string FirstName { get; set; }
+        public string FirstName { get; set; }
 
-        string LastName { get; set; }
+        public string LastName { get; set; }
 
         [EmailAddress]
         [Required(ErrorMessage = "Email is required")]
-        string Email { get; set; }
+        public string Email { get; set; }
 
         [Required(ErrorMessage = "Password is required")]
         [MinLength(8, ErrorMessage = "Password must be at least 8 characters long")]

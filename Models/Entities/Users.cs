@@ -23,6 +23,8 @@ namespace EduPortal.Models.Entities
 
         public int StatusId { get; set; }
 
+        public DateTime BirthDate { get; set; }
+
         public DateTime Created { get; set; } = DateTime.Now;
 
         public bool IsLocked { get; set; } = false;
@@ -48,5 +50,7 @@ namespace EduPortal.Models.Entities
         public List<Courses> Course { get; set; }
 
         public List<Enrollments> Enrollments { get; set; }
+
+        public List<EmailVerification> EmailVerifications { get; set; }
     }
 }

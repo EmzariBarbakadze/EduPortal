@@ -17,7 +17,7 @@ namespace EduPortal.Services
         {
             var log = new ExceptionLogs
             {
-                Code = "SYS_500",
+                Code = "SYS_500",        // Check information table of codes. 
                 Message = ex.Message,
                 StackTrace = ex.StackTrace,
                 Source = ex.Source,
