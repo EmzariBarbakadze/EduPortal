@@ -1,4 +1,5 @@
 ﻿using EduPortal.Interfaces;
+using EduPortal.Models.DTOs;
 using EduPortal.Models.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -20,40 +21,57 @@ namespace EduPortal.Controllers
             _logger = logger;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Register()
+        [HttpPost("Register")]
+        public async Task<IActionResult> Register(UserRegisterDTO dto)
         {
-            try
+            if (!ModelState.IsValid)
             {
-                return Ok();
-            }
-            catch (ValidationException ex)
-            {
-                // await _logger.LogExceptionAsync(ex, HttpContext, null);
-                return BadRequest("Invalid input.");
+                await _logger.LogServiceErrorAsync(
+                    "1000",
+                    "Modelstate is not valid in Register controller",
+                    "Controller",
+                    "Register",
+                    null
+                );
+                return BadRequest(ModelState);
             }
 
+            var response = await _authService.RegisterAsync(dto);
+
+            if (!response.Success)
+            {
+                return BadRequest(response.Message);
+            }
+
+            return Ok(response.Data);
         }
 
-        [HttpPost]
+        [HttpPost("VerifyEmail")]
+        public async Task<IActionResult> VerifyEmail(string email, int code)
+        {
+            return Ok();
+        }
+
+        [HttpPost("ResendCode")]
+        public async Task<IActionResult> ResendCode(string email)
+        {
+            return Ok();
+        }
+
+        [HttpPost("Login")]
         public async Task<IActionResult> Login()
         {
             return Ok();
         }
 
-        [HttpPost]
+        [HttpPost("Logout")]
         public async Task<IActionResult> Logout()
         {
             return Ok();
         }
 
-        [HttpPost]
+        [HttpPost("Refresh")]
         public async Task<IActionResult> Refresh()
-        {
-            return Ok();
-        }
-
-        public async Task<IActionResult> Me()
         {
             return Ok();
         }

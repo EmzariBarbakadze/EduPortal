@@ -32,6 +32,8 @@ namespace EduPortal.Data
         public DbSet<UsersSessions> UsersSessions { get; set; }
         public DbSet<UserTokens> UserTokens { get; set; }
 
+        public DbSet<EmailVerification> EmailVerification { get; set; }
+
 
         // Seed Inf Tables
 
@@ -68,7 +70,7 @@ namespace EduPortal.Data
             );
 
             modelBuilder.Entity<Inf_ErrorCodes>().HasData(
-                new Inf_ErrorCodes { Code = 1000, DescrLocal = "ზოგადი შეცდომა", DescrEng = "General system error", IsActive = true },
+                new Inf_ErrorCodes { Code = 1000, DescrLocal = "არასწორი პარამეტრი ფუნქციაში", DescrEng = "Invalid parameter in the function", IsActive = true },
                 new Inf_ErrorCodes { Code = 1001, DescrLocal = "მონაცემები ვერ მოიძებნა", DescrEng = "Data not found", IsActive = true },
                 new Inf_ErrorCodes { Code = 1002, DescrLocal = "არასწორი შეყვანილი მონაცემები", DescrEng = "Invalid input data", IsActive = true },
                 new Inf_ErrorCodes { Code = 1003, DescrLocal = "მომხმარებელი ვერ მოიძებნა", DescrEng = "User not found", IsActive = true },
@@ -108,7 +110,7 @@ namespace EduPortal.Data
                  new Inf_UserStatuses { StatusId = 2, DescrLocal = "არაქტიური", DescrEng = "Inactive", IsActive = true },
                  new Inf_UserStatuses { StatusId = 3, DescrLocal = "შეჩერებული", DescrEng = "Suspended", IsActive = true },
                  new Inf_UserStatuses { StatusId = 4, DescrLocal = "დაბლოკილი", DescrEng = "Blocked", IsActive = true },
-                 new Inf_UserStatuses { StatusId = 5, DescrLocal = "დარეგისტრირებული, დაუდასტურებელი", DescrEng = "Registered (Unconfirmed)", IsActive = true },
+                 new Inf_UserStatuses { StatusId = 5, DescrLocal = "დაუდასტურებელი", DescrEng = "Unverified", IsActive = true },
                  new Inf_UserStatuses { StatusId = 6, DescrLocal = "წაშლილი", DescrEng = "Deleted", IsActive = true }
             );
 
