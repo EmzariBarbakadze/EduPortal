@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using EduPortal.Interfaces;
+using EduPortal.Middlewares;
 
 namespace EduPortal
 {
@@ -52,6 +53,7 @@ namespace EduPortal
 
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<IErrorLogger, ErrorLogger>();
 
             var app = builder.Build();
 
@@ -64,6 +66,9 @@ namespace EduPortal
             }
 
             app.UseHttpsRedirection();
+
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
+
 
             app.UseAuthentication();  // Checks JWT token
             app.UseAuthorization();   // Checks user roles and permissions

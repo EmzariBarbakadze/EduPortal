@@ -1,6 +1,9 @@
 ﻿using EduPortal.Interfaces;
+using EduPortal.Models.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
+using System.IO;
 
 namespace EduPortal.Controllers
 {
@@ -9,16 +12,27 @@ namespace EduPortal.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
+        private readonly IErrorLogger _logger;
 
-        public AuthController(IAuthService authService)
+        public AuthController(IAuthService authService, IErrorLogger logger)
         {
             _authService = authService;
+            _logger = logger;
         }
 
         [HttpPost]
         public async Task<IActionResult> Register()
         {
-            return Ok();
+            try
+            {
+                return Ok();
+            }
+            catch (ValidationException ex)
+            {
+                // await _logger.LogExceptionAsync(ex, HttpContext, null);
+                return BadRequest("Invalid input.");
+            }
+
         }
 
         [HttpPost]
