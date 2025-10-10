@@ -3,6 +3,7 @@ using EduPortal.Interfaces;
 using EduPortal.Models.DTOs;
 using EduPortal.Models.Entities;
 using EduPortal.Models.HelperClasses;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace EduPortal.Services
@@ -12,12 +13,14 @@ namespace EduPortal.Services
         private readonly ApplicationDbContext _context;
         private readonly ITokenService _token;
         private readonly IErrorLogger _logger;
+        private readonly IPasswordHasher<Users> _hasher;
 
-        public AuthService(ApplicationDbContext context, ITokenService token, IErrorLogger logger)
+        public AuthService(ApplicationDbContext context, ITokenService token, IErrorLogger logger, IPasswordHasher<Users> hasher)
         {
             _context = context;
             _token = token;
             _logger = logger;
+            _hasher = hasher;
         }
 
 
@@ -52,7 +55,7 @@ namespace EduPortal.Services
                 return response.FailResponse("Parameter for RegisterAsync can not be null");
             }
 
-            if (await _context.Users.FirstOrDefaultAsync(x => x.Email == model.Email && x.StatusId != 6) is not null)
+            if (await _context.Users.FirstOrDefaultAsync(x => x.Email == model.Email) is not null)
             {
                 await _logger.LogServiceErrorAsync(
                     "1000",
@@ -64,10 +67,13 @@ namespace EduPortal.Services
                 return response.FailResponse("User with this email already exists");
             }
 
-            if(await _context.Users.FirstOrDefaultAsync(x => x.Email == model.Email && x.StatusId == 6) is not null)
+            var newUser = new Users
             {
-                return response; // ჯერ გამართე მესიჯების გამგზავნი ჯობი. რეგისტრაციისას გაითვალისწინე როლები. ლექტორის როლის ამბავს ადასტურებს ადმინი
-            }
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                Email = model.Email, 
+                PasswordHash = _hasher.HashPassword(model.Password)
+            };
 
             return response.SuccessResponse(null, "Test");
         }
