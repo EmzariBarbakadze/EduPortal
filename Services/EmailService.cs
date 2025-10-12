@@ -1,4 +1,4 @@
-﻿using EduPortal.Config;
+﻿using EduPortal.Models.HelperClasses;
 using EduPortal.Interfaces;
 using Microsoft.Extensions.Options;
 using System.Net.Mail;
