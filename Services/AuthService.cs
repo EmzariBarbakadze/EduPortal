@@ -71,8 +71,7 @@ namespace EduPortal.Services
             {
                 FirstName = model.FirstName,
                 LastName = model.LastName,
-                Email = model.Email, 
-                PasswordHash = _hasher.HashPassword(model.Password)
+                Email = model.Email
             };
 
             return response.SuccessResponse(null, "Test");

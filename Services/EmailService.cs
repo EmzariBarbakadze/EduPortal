@@ -1,4 +1,4 @@
-﻿using EduPortal.Config;
+﻿using EduPortal.Models.HelperClasses;
 using EduPortal.Interfaces;
 using Microsoft.Extensions.Options;
 using System.Net.Mail;
@@ -14,6 +14,7 @@ namespace EduPortal.Services
         {
             _settings = settings.Value;
         }
+
 
         public async Task SendEmailAsync(string toEmail, string subject, string body)
         {
