@@ -136,5 +136,10 @@ namespace EduPortal.Services
         {
             throw new NotImplementedException();
         }
+
+        Task<ServiceResponse<AuthResultDTO>> IAuthService.RegisterAsync(UserRegisterDTO model)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
