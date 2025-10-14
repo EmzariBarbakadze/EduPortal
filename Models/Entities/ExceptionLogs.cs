@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EduPortal.Models.Entities
 {
@@ -7,8 +8,7 @@ namespace EduPortal.Models.Entities
         [Key]
         public int Id { get; set; }
 
-        [MaxLength(50)]
-        public string Code { get; set; } = "N/A";
+        public string? Code { get; set; } = "0000";
 
         [MaxLength(200)]
         public string Message { get; set; } = string.Empty;
@@ -26,7 +26,7 @@ namespace EduPortal.Models.Entities
         public string? Path { get; set; }    // Request path if from API
 
         // User & environment
-        public string? UserId { get; set; }
+        public int? UserId { get; set; }
         public string? IpAddress { get; set; }
         public string? DeviceInfo { get; set; }
 
@@ -34,8 +34,10 @@ namespace EduPortal.Models.Entities
 
         // ---------------------------------------------------
 
-        public Inf_ErrorCodes Inf_ErrorCodes { get; set; }
+        [ForeignKey("Code")]
+        public Inf_ErrorCodes ErrorCode { get; set; }
 
-        public Users Users { get; set; }
+        [ForeignKey("UserId")]
+        public Users User { get; set; }
     }
 }

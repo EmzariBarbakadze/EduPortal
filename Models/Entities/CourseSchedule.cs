@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.Eventing.Reader;
 
 namespace EduPortal.Models.Entities
@@ -24,9 +26,11 @@ namespace EduPortal.Models.Entities
 
         // ------------------------------------------
 
-        public Inf_CourseLocationTypes CourseLocationTypes { get; set; }
+        [ForeignKey("LocationTypeId")]
+        public Inf_CourseLocationTypes LocationType { get; set; }
 
-        public Courses Courses { get; set; }
+        [ForeignKey("CourseId")]
+        public Courses Course { get; set; }
 
         public List<CourseScheduleAttributes> CourseScheduleAttributes { get; set; }
     }

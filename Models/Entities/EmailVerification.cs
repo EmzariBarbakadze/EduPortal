@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EduPortal.Models.Entities
 {
@@ -7,6 +8,8 @@ namespace EduPortal.Models.Entities
         [Key]
         public int Id { get; set; }
 
+        public int UserId { get; set; }
+
         public string Email { get; set; }
 
         [MinLength(5), MaxLength(5)]
@@ -14,12 +17,13 @@ namespace EduPortal.Models.Entities
 
         public DateTime Created { get; set; } = DateTime.Now;
 
-        public DateTime ExpirationDate { get; set; }
+        public DateTime ExpirationDate { get; set; } = DateTime.Now.AddMinutes(1);
 
         public bool IsUsed { get; set; } = false;
 
         // ---------------------------------------------------------
 
-        public Users Users { get; set; }
+        [ForeignKey("UserId")]
+        public Users User { get; set; }
     }
 }

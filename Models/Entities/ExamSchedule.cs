@@ -16,7 +16,6 @@ namespace EduPortal.Models.Entities
 
         public int ExamTypeId { get; set; }
 
-        [ForeignKey("UserId")]
         public int Lecturer { get; set; }
 
         public string? Location { get; set; }
@@ -25,14 +24,18 @@ namespace EduPortal.Models.Entities
 
         // ------------------------------------------
 
-        public Inf_ExamTypes ExamTypes { get; set; }
+        [ForeignKey("ExamTypeId")]
+        public Inf_ExamTypes ExamType { get; set; }
 
         public List<ExamResults> ExamResults { get; set; }
 
-        public Users Users { get; set; }
+        [ForeignKey("Lecturer")]
+        public Users User { get; set; }
 
-        public Courses Courses { get; set; }
+        [ForeignKey("CourseId")]
+        public Courses Course { get; set; }
 
-        public Inf_CourseLocationTypes CourseLocationTypes { get; set; }
+        [ForeignKey("LocationTypeId")]
+        public Inf_CourseLocationTypes CourseLocationType { get; set; }
     }
 }

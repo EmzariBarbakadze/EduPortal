@@ -23,7 +23,6 @@ namespace EduPortal.Services
             _hasher = hasher;
         }
 
-
         public Task<ServiceResponse<AuthResultDTO>> LoginAsync(UserLoginDTO model)
         {
             throw new NotImplementedException();
@@ -39,23 +38,23 @@ namespace EduPortal.Services
             throw new NotImplementedException();
         }
 
-        public async Task<ServiceResponse<AuthResultDTO>> RegisterAsync(UserRegisterDTO model)
+        public async Task<ServiceResponse<string>> RegisterAsync(UserRegisterDTO model)
         {
-            var response = new ServiceResponse<AuthResultDTO>();
+            var response = new ServiceResponse<string>();
 
             if (model is null)
             {
                 await _logger.LogServiceErrorAsync(
-                    "1000", 
+                    "1000",
                     "Parameter for RegisterAsync can not be null",
                     "Service",
-                    "RegisterAsync", 
+                    "RegisterAsync",
                     null
                     );
                 return response.FailResponse("Parameter for RegisterAsync can not be null");
             }
 
-            if (await _context.Users.FirstOrDefaultAsync(x => x.Email == model.Email) is not null)
+            if (await _context.Users.FirstOrDefaultAsync(x => x.Email == model.Email && x.IsVerified == true) is not null)
             {
                 await _logger.LogServiceErrorAsync(
                     "1000",
@@ -67,14 +66,70 @@ namespace EduPortal.Services
                 return response.FailResponse("User with this email already exists");
             }
 
-            var newUser = new Users
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == model.Email && x.IsVerified == false);
+            var newUser = new Users();
+
+            if(user is not null)
             {
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                Email = model.Email
+                user.FirstName = model.FirstName;
+                user.LastName = model.LastName;
+                user.UserName = model.Email.Split('@')[0];
+                user.PasswordHash = _hasher.HashPassword(user, model.Password);
+                user.StatusId = 5;
+            }
+            else
+            {
+                newUser = new Users
+                {
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    Email = model.Email,
+                    UserName = model.Email.Split('@')[0],
+                    StatusId = 5
+                };
+
+                newUser.PasswordHash = _hasher.HashPassword(newUser, model.Password);
+
+                await _context.Users.AddAsync(newUser);
+                try
+                {
+                    await _context.SaveChangesAsync();
+                }
+                catch(Exception ex)
+                {
+                    return response.FailResponse(ex.Message);
+                }
+            }
+                      
+
+            var emailVerificator = new EmailVerification 
+            { 
+                UserId = user?.UserId ?? newUser.UserId,
+                Email = model.Email,
+                Code = new Random().Next(10000, 99999)
             };
 
-            return response.SuccessResponse(null, "Test");
+            if(await _context.UsersRoles.FirstOrDefaultAsync(x => x.UserId == emailVerificator.UserId) is null)
+            {
+                var userRole = new UsersRoles
+                {
+                    UserId = emailVerificator.UserId,
+                    RoleId = 1
+                };
+
+                await _context.UsersRoles.AddAsync(userRole);
+            }
+
+            try
+            {
+                await _context.EmailVerification.AddAsync(emailVerificator);
+                await _context.SaveChangesAsync();
+            }
+            catch(Exception ex)
+            {
+                return response.FailResponse(ex.Message);
+            }
+            return response.SuccessResponse(model.Email, $"Code sent to the email {model.Email}");
         }
 
         public Task<Users?> ValidateUserAsync(string username, string password)

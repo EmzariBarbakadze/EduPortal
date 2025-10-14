@@ -18,15 +18,17 @@ namespace EduPortal.Models.Entities
 
         public DateTime ExamDate { get; set; }
 
-        [ForeignKey("UserId")]
         public int Lecturer { get; set; }
 
         // ----------------------------------------
 
-        public Users Users { get; set; }
+        [ForeignKey("Lecturer")]
+        public Users User { get; set; }
 
-        public Inf_ExamTypes ExamTypes { get; set; }
+        [ForeignKey("ExamTypeId")]
+        public Inf_ExamTypes ExamType { get; set; }
 
-        public ExamSchedule ExamSchedules { get; set; }
+        [ForeignKey("ExamScheduleId")]
+        public ExamSchedule Schedule { get; set; }
     }
 }

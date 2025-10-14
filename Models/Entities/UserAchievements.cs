@@ -1,5 +1,6 @@
 ﻿using EduPortal.Models.BaseClasses;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EduPortal.Models.Entities
 {
@@ -14,8 +15,10 @@ namespace EduPortal.Models.Entities
 
         // ---------------------------------------------
 
-        public Achievements Achievements { get; set; }
+        [ForeignKey("AchievementId")]
+        public Achievements Achievement { get; set; }
 
-        public Users Users { get; set; }
+        [ForeignKey("UserId")]
+        public Users User { get; set; }
     }
 }

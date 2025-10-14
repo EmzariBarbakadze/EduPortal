@@ -19,16 +19,17 @@ namespace EduPortal.Models.Entities
 
         public int CourseCategoryId { get; set; }
 
-        [ForeignKey("UserId")]
         public int CreatorId { get; set; }
 
         // ---------------------------------------------
 
         public List<ExamSchedule> ExamSchedules { get; set; }
 
-        public Users Users { get; set; }
+        [ForeignKey("CreatorId")]
+        public Users Creator { get; set; }
 
-        public Inf_CourseCategories CourseCategories { get; set; }
+        [ForeignKey("CourseCategoryId")]
+        public Inf_CourseCategories Categories { get; set; }
 
         public List<Enrollments> Enrollments { get; set; }
 

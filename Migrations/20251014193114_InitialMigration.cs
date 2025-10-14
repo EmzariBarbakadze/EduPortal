@@ -79,8 +79,7 @@ namespace EduPortal.Migrations
                 name: "Inf_ErrorCodes",
                 columns: table => new
                 {
-                    Code = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Code = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     DescrLocal = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DescrEng = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false)
@@ -191,17 +190,18 @@ namespace EduPortal.Migrations
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     StatusId = table.Column<int>(type: "int", nullable: false),
+                    BirthDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsLocked = table.Column<bool>(type: "bit", nullable: false),
                     LockedUntill = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Inf_UserStatusesStatusId = table.Column<int>(type: "int", nullable: false)
+                    IsVerified = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.UserId);
                     table.ForeignKey(
-                        name: "FK_Users_Inf_UserStatuses_Inf_UserStatusesStatusId",
-                        column: x => x.Inf_UserStatusesStatusId,
+                        name: "FK_Users_Inf_UserStatuses_StatusId",
+                        column: x => x.StatusId,
                         principalTable: "Inf_UserStatuses",
                         principalColumn: "StatusId",
                         onDelete: ReferentialAction.Restrict);
@@ -219,8 +219,6 @@ namespace EduPortal.Migrations
                     DescriptionEng = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CourseCategoryId = table.Column<int>(type: "int", nullable: false),
                     CreatorId = table.Column<int>(type: "int", nullable: false),
-                    UsersUserId = table.Column<int>(type: "int", nullable: false),
-                    CourseCategoriesCourseCategoryId = table.Column<int>(type: "int", nullable: false),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false)
                 },
@@ -228,14 +226,38 @@ namespace EduPortal.Migrations
                 {
                     table.PrimaryKey("PK_Courses", x => x.CourseId);
                     table.ForeignKey(
-                        name: "FK_Courses_Inf_CourseCategories_CourseCategoriesCourseCategoryId",
-                        column: x => x.CourseCategoriesCourseCategoryId,
+                        name: "FK_Courses_Inf_CourseCategories_CourseCategoryId",
+                        column: x => x.CourseCategoryId,
                         principalTable: "Inf_CourseCategories",
                         principalColumn: "CourseCategoryId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Courses_Users_UsersUserId",
-                        column: x => x.UsersUserId,
+                        name: "FK_Courses_Users_CreatorId",
+                        column: x => x.CreatorId,
+                        principalTable: "Users",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EmailVerification",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Code = table.Column<int>(type: "int", maxLength: 5, nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ExpirationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsUsed = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EmailVerification", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_EmailVerification_Users_UserId",
+                        column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Restrict);
@@ -245,31 +267,34 @@ namespace EduPortal.Migrations
                 name: "ExceptionLogs",
                 columns: table => new
                 {
-                    LogId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    Code = table.Column<int>(type: "int", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IpAdress = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Inf_ErrorCodesCode = table.Column<int>(type: "int", nullable: false),
-                    UsersUserId = table.Column<int>(type: "int", nullable: false)
+                    Code = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    Message = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Details = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    StackTrace = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Source = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Layer = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Method = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Path = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserId = table.Column<int>(type: "int", nullable: true),
+                    IpAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DeviceInfo = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ExceptionLogs", x => x.LogId);
+                    table.PrimaryKey("PK_ExceptionLogs", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ExceptionLogs_Inf_ErrorCodes_Inf_ErrorCodesCode",
-                        column: x => x.Inf_ErrorCodesCode,
+                        name: "FK_ExceptionLogs_Inf_ErrorCodes_Code",
+                        column: x => x.Code,
                         principalTable: "Inf_ErrorCodes",
-                        principalColumn: "Code",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "Code");
                     table.ForeignKey(
-                        name: "FK_ExceptionLogs_Users_UsersUserId",
-                        column: x => x.UsersUserId,
+                        name: "FK_ExceptionLogs_Users_UserId",
+                        column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "UserId",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "UserId");
                 });
 
             migrationBuilder.CreateTable(
@@ -282,22 +307,20 @@ namespace EduPortal.Migrations
                     NotificationTypeId = table.Column<int>(type: "int", nullable: false),
                     Message = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IsSent = table.Column<bool>(type: "bit", nullable: false),
-                    UsersUserId = table.Column<int>(type: "int", nullable: false),
-                    NotificationTypesNotificationTypeId = table.Column<int>(type: "int", nullable: false)
+                    IsSent = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Notifications", x => x.NotificationId);
                     table.ForeignKey(
-                        name: "FK_Notifications_Inf_NotificationTypes_NotificationTypesNotificationTypeId",
-                        column: x => x.NotificationTypesNotificationTypeId,
+                        name: "FK_Notifications_Inf_NotificationTypes_NotificationTypeId",
+                        column: x => x.NotificationTypeId,
                         principalTable: "Inf_NotificationTypes",
                         principalColumn: "NotificationTypeId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Notifications_Users_UsersUserId",
-                        column: x => x.UsersUserId,
+                        name: "FK_Notifications_Users_UserId",
+                        column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Restrict);
@@ -311,8 +334,6 @@ namespace EduPortal.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<int>(type: "int", nullable: false),
                     AchievementId = table.Column<int>(type: "int", nullable: false),
-                    AchievementsAchievementId = table.Column<int>(type: "int", nullable: false),
-                    UsersUserId = table.Column<int>(type: "int", nullable: false),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false)
                 },
@@ -320,14 +341,14 @@ namespace EduPortal.Migrations
                 {
                     table.PrimaryKey("PK_UserAchievements", x => x.UserAchievementId);
                     table.ForeignKey(
-                        name: "FK_UserAchievements_Achievements_AchievementsAchievementId",
-                        column: x => x.AchievementsAchievementId,
+                        name: "FK_UserAchievements_Achievements_AchievementId",
+                        column: x => x.AchievementId,
                         principalTable: "Achievements",
                         principalColumn: "AchievementId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_UserAchievements_Users_UsersUserId",
-                        column: x => x.UsersUserId,
+                        name: "FK_UserAchievements_Users_UserId",
+                        column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Restrict);
@@ -341,8 +362,6 @@ namespace EduPortal.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<int>(type: "int", nullable: false),
                     RoleId = table.Column<int>(type: "int", nullable: false),
-                    UsersUserId = table.Column<int>(type: "int", nullable: false),
-                    RolesRoleId = table.Column<int>(type: "int", nullable: false),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false)
                 },
@@ -350,14 +369,14 @@ namespace EduPortal.Migrations
                 {
                     table.PrimaryKey("PK_UsersRoles", x => x.UserRoleId);
                     table.ForeignKey(
-                        name: "FK_UsersRoles_Roles_RolesRoleId",
-                        column: x => x.RolesRoleId,
+                        name: "FK_UsersRoles_Roles_RoleId",
+                        column: x => x.RoleId,
                         principalTable: "Roles",
                         principalColumn: "RoleId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_UsersRoles_Users_UsersUserId",
-                        column: x => x.UsersUserId,
+                        name: "FK_UsersRoles_Users_UserId",
+                        column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Restrict);
@@ -374,22 +393,20 @@ namespace EduPortal.Migrations
                     DateEnd = table.Column<DateTime>(type: "datetime2", nullable: true),
                     ValidTill = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IpAdress = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RestrictionLevelId = table.Column<int>(type: "int", nullable: false),
-                    UsersUserId = table.Column<int>(type: "int", nullable: false),
-                    Inf_RestrictionLevelsRestrictionLevelId = table.Column<int>(type: "int", nullable: false)
+                    RestrictionLevelId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_UsersSessions", x => x.UserSessionId);
                     table.ForeignKey(
-                        name: "FK_UsersSessions_Inf_RestrictionLevels_Inf_RestrictionLevelsRestrictionLevelId",
-                        column: x => x.Inf_RestrictionLevelsRestrictionLevelId,
+                        name: "FK_UsersSessions_Inf_RestrictionLevels_RestrictionLevelId",
+                        column: x => x.RestrictionLevelId,
                         principalTable: "Inf_RestrictionLevels",
                         principalColumn: "RestrictionLevelId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_UsersSessions_Users_UsersUserId",
-                        column: x => x.UsersUserId,
+                        name: "FK_UsersSessions_Users_UserId",
+                        column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Restrict);
@@ -407,22 +424,20 @@ namespace EduPortal.Migrations
                     WeeklyDuration = table.Column<int>(type: "int", nullable: false),
                     Location = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LocationTypeId = table.Column<int>(type: "int", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    CourseLocationTypesLocationTypeId = table.Column<int>(type: "int", nullable: false),
-                    CoursesCourseId = table.Column<int>(type: "int", nullable: false)
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_CourseSchedules", x => x.CourseScheduleId);
                     table.ForeignKey(
-                        name: "FK_CourseSchedules_Courses_CoursesCourseId",
-                        column: x => x.CoursesCourseId,
+                        name: "FK_CourseSchedules_Courses_CourseId",
+                        column: x => x.CourseId,
                         principalTable: "Courses",
                         principalColumn: "CourseId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_CourseSchedules_Inf_CourseLocationTypes_CourseLocationTypesLocationTypeId",
-                        column: x => x.CourseLocationTypesLocationTypeId,
+                        name: "FK_CourseSchedules_Inf_CourseLocationTypes_LocationTypeId",
+                        column: x => x.LocationTypeId,
                         principalTable: "Inf_CourseLocationTypes",
                         principalColumn: "LocationTypeId",
                         onDelete: ReferentialAction.Restrict);
@@ -436,8 +451,6 @@ namespace EduPortal.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<int>(type: "int", nullable: false),
                     CourseId = table.Column<int>(type: "int", nullable: false),
-                    UsersUserId = table.Column<int>(type: "int", nullable: false),
-                    CoursesCourseId = table.Column<int>(type: "int", nullable: false),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false)
                 },
@@ -445,14 +458,14 @@ namespace EduPortal.Migrations
                 {
                     table.PrimaryKey("PK_Enrollments", x => x.EnrollmentId);
                     table.ForeignKey(
-                        name: "FK_Enrollments_Courses_CoursesCourseId",
-                        column: x => x.CoursesCourseId,
+                        name: "FK_Enrollments_Courses_CourseId",
+                        column: x => x.CourseId,
                         principalTable: "Courses",
                         principalColumn: "CourseId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Enrollments_Users_UsersUserId",
-                        column: x => x.UsersUserId,
+                        name: "FK_Enrollments_Users_UserId",
+                        column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Restrict);
@@ -470,36 +483,32 @@ namespace EduPortal.Migrations
                     ExamTypeId = table.Column<int>(type: "int", nullable: false),
                     Lecturer = table.Column<int>(type: "int", nullable: false),
                     Location = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LocationTypeId = table.Column<int>(type: "int", nullable: false),
-                    ExamTypesExamTypeId = table.Column<int>(type: "int", nullable: false),
-                    UsersUserId = table.Column<int>(type: "int", nullable: false),
-                    CoursesCourseId = table.Column<int>(type: "int", nullable: false),
-                    CourseLocationTypesLocationTypeId = table.Column<int>(type: "int", nullable: false)
+                    LocationTypeId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ExamSchedule", x => x.ExamScheduleId);
                     table.ForeignKey(
-                        name: "FK_ExamSchedule_Courses_CoursesCourseId",
-                        column: x => x.CoursesCourseId,
+                        name: "FK_ExamSchedule_Courses_CourseId",
+                        column: x => x.CourseId,
                         principalTable: "Courses",
                         principalColumn: "CourseId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_ExamSchedule_Inf_CourseLocationTypes_CourseLocationTypesLocationTypeId",
-                        column: x => x.CourseLocationTypesLocationTypeId,
+                        name: "FK_ExamSchedule_Inf_CourseLocationTypes_LocationTypeId",
+                        column: x => x.LocationTypeId,
                         principalTable: "Inf_CourseLocationTypes",
                         principalColumn: "LocationTypeId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_ExamSchedule_Inf_ExamTypes_ExamTypesExamTypeId",
-                        column: x => x.ExamTypesExamTypeId,
+                        name: "FK_ExamSchedule_Inf_ExamTypes_ExamTypeId",
+                        column: x => x.ExamTypeId,
                         principalTable: "Inf_ExamTypes",
                         principalColumn: "ExamTypeId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_ExamSchedule_Users_UsersUserId",
-                        column: x => x.UsersUserId,
+                        name: "FK_ExamSchedule_Users_Lecturer",
+                        column: x => x.Lecturer,
                         principalTable: "Users",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Restrict);
@@ -516,26 +525,22 @@ namespace EduPortal.Migrations
                     JwtId = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ExpiresAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    RewokedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IsUsed = table.Column<bool>(type: "bit", nullable: false),
-                    IpAdress = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DeviceInfo = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    SessionId = table.Column<int>(type: "int", nullable: true),
-                    UsersSessionsUserSessionId = table.Column<int>(type: "int", nullable: false),
-                    UsersUserId = table.Column<int>(type: "int", nullable: false)
+                    RevokedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IpAdress = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DeviceInfo = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SessionId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_UserTokens", x => x.TokenId);
                     table.ForeignKey(
-                        name: "FK_UserTokens_UsersSessions_UsersSessionsUserSessionId",
-                        column: x => x.UsersSessionsUserSessionId,
+                        name: "FK_UserTokens_UsersSessions_SessionId",
+                        column: x => x.SessionId,
                         principalTable: "UsersSessions",
-                        principalColumn: "UserSessionId",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "UserSessionId");
                     table.ForeignKey(
-                        name: "FK_UserTokens_Users_UsersUserId",
-                        column: x => x.UsersUserId,
+                        name: "FK_UserTokens_Users_UserId",
+                        column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Restrict);
@@ -552,9 +557,7 @@ namespace EduPortal.Migrations
                     WeekDayId = table.Column<int>(type: "int", nullable: false),
                     StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    activityTypesActivityTypeId = table.Column<int>(type: "int", nullable: false),
-                    WeekDaysWeekDayId = table.Column<int>(type: "int", nullable: false)
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -566,14 +569,14 @@ namespace EduPortal.Migrations
                         principalColumn: "CourseScheduleId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_CourseScheduleAttributes_Inf_ActivityTypes_activityTypesActivityTypeId",
-                        column: x => x.activityTypesActivityTypeId,
+                        name: "FK_CourseScheduleAttributes_Inf_ActivityTypes_ActivityTypeId",
+                        column: x => x.ActivityTypeId,
                         principalTable: "Inf_ActivityTypes",
                         principalColumn: "ActivityTypeId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_CourseScheduleAttributes_Inf_Weekdays_WeekDaysWeekDayId",
-                        column: x => x.WeekDaysWeekDayId,
+                        name: "FK_CourseScheduleAttributes_Inf_Weekdays_WeekDayId",
+                        column: x => x.WeekDayId,
                         principalTable: "Inf_Weekdays",
                         principalColumn: "WeekDayId",
                         onDelete: ReferentialAction.Restrict);
@@ -590,9 +593,7 @@ namespace EduPortal.Migrations
                     ExamTypeId = table.Column<int>(type: "int", nullable: false),
                     ResultScore = table.Column<float>(type: "real", nullable: false),
                     ExamDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Lecturer = table.Column<int>(type: "int", nullable: false),
-                    UsersUserId = table.Column<int>(type: "int", nullable: false),
-                    ExamTypesExamTypeId = table.Column<int>(type: "int", nullable: false)
+                    Lecturer = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -604,14 +605,14 @@ namespace EduPortal.Migrations
                         principalColumn: "ExamScheduleId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_ExamResults_Inf_ExamTypes_ExamTypesExamTypeId",
-                        column: x => x.ExamTypesExamTypeId,
+                        name: "FK_ExamResults_Inf_ExamTypes_ExamTypeId",
+                        column: x => x.ExamTypeId,
                         principalTable: "Inf_ExamTypes",
                         principalColumn: "ExamTypeId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_ExamResults_Users_UsersUserId",
-                        column: x => x.UsersUserId,
+                        name: "FK_ExamResults_Users_Lecturer",
+                        column: x => x.Lecturer,
                         principalTable: "Users",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Restrict);
@@ -655,19 +656,20 @@ namespace EduPortal.Migrations
                 columns: new[] { "Code", "DescrEng", "DescrLocal", "IsActive" },
                 values: new object[,]
                 {
-                    { 1000, "General system error", "ზოგადი შეცდომა", true },
-                    { 1001, "Data not found", "მონაცემები ვერ მოიძებნა", true },
-                    { 1002, "Invalid input data", "არასწორი შეყვანილი მონაცემები", true },
-                    { 1003, "User not found", "მომხმარებელი ვერ მოიძებნა", true },
-                    { 1004, "Invalid password", "პაროლი არასწორია", true },
-                    { 1005, "Access denied", "წვდომა აკრძალულია", true },
-                    { 1006, "Session expired", "სესია დასრულებულია", true },
-                    { 1007, "Unauthorized request", "მოთხოვნა არ არის ავტორიზებული", true },
-                    { 1008, "Data processing failed", "მონაცემების დამუშავება ვერ მოხერხდა", true },
-                    { 1009, "Server temporarily unavailable", "სერვერი დროებით მიუწვდომელია", true },
-                    { 1010, "Course not found", "კურსი ვერ მოიძებნა", true },
-                    { 1011, "Exam not found", "გამოცდა ვერ მოიძებნა", true },
-                    { 1012, "User already registered", "მომხმარებელს უკვე აქვს რეგისტრაცია", true }
+                    { "1", "Unknown error", "უცნობი შეცდომა", true },
+                    { "1000", "Invalid parameter in the function", "არასწორი პარამეტრი ფუნქციაში", true },
+                    { "1001", "Data not found", "მონაცემები ვერ მოიძებნა", true },
+                    { "1002", "Invalid input data", "არასწორი შეყვანილი მონაცემები", true },
+                    { "1003", "User not found", "მომხმარებელი ვერ მოიძებნა", true },
+                    { "1004", "Invalid password", "პაროლი არასწორია", true },
+                    { "1005", "Access denied", "წვდომა აკრძალულია", true },
+                    { "1006", "Session expired", "სესია დასრულებულია", true },
+                    { "1007", "Unauthorized request", "მოთხოვნა არ არის ავტორიზებული", true },
+                    { "1008", "Data processing failed", "მონაცემების დამუშავება ვერ მოხერხდა", true },
+                    { "1009", "Server temporarily unavailable", "სერვერი დროებით მიუწვდომელია", true },
+                    { "1010", "Course not found", "კურსი ვერ მოიძებნა", true },
+                    { "1011", "Exam not found", "გამოცდა ვერ მოიძებნა", true },
+                    { "1012", "User already registered", "მომხმარებელს უკვე აქვს რეგისტრაცია", true }
                 });
 
             migrationBuilder.InsertData(
@@ -708,7 +710,7 @@ namespace EduPortal.Migrations
                     { 2, "Inactive", "არაქტიური", true },
                     { 3, "Suspended", "შეჩერებული", true },
                     { 4, "Blocked", "დაბლოკილი", true },
-                    { 5, "Registered (Unconfirmed)", "დარეგისტრირებული, დაუდასტურებელი", true },
+                    { 5, "Unverified", "დაუდასტურებელი", true },
                     { 6, "Deleted", "წაშლილი", true }
                 });
 
@@ -738,19 +740,19 @@ namespace EduPortal.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Courses_CourseCategoriesCourseCategoryId",
+                name: "IX_Courses_CourseCategoryId",
                 table: "Courses",
-                column: "CourseCategoriesCourseCategoryId");
+                column: "CourseCategoryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Courses_UsersUserId",
+                name: "IX_Courses_CreatorId",
                 table: "Courses",
-                column: "UsersUserId");
+                column: "CreatorId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CourseScheduleAttributes_activityTypesActivityTypeId",
+                name: "IX_CourseScheduleAttributes_ActivityTypeId",
                 table: "CourseScheduleAttributes",
-                column: "activityTypesActivityTypeId");
+                column: "ActivityTypeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CourseScheduleAttributes_CourseScheduleId",
@@ -758,29 +760,34 @@ namespace EduPortal.Migrations
                 column: "CourseScheduleId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CourseScheduleAttributes_WeekDaysWeekDayId",
+                name: "IX_CourseScheduleAttributes_WeekDayId",
                 table: "CourseScheduleAttributes",
-                column: "WeekDaysWeekDayId");
+                column: "WeekDayId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CourseSchedules_CourseLocationTypesLocationTypeId",
+                name: "IX_CourseSchedules_CourseId",
                 table: "CourseSchedules",
-                column: "CourseLocationTypesLocationTypeId");
+                column: "CourseId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CourseSchedules_CoursesCourseId",
+                name: "IX_CourseSchedules_LocationTypeId",
                 table: "CourseSchedules",
-                column: "CoursesCourseId");
+                column: "LocationTypeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Enrollments_CoursesCourseId",
-                table: "Enrollments",
-                column: "CoursesCourseId");
+                name: "IX_EmailVerification_UserId",
+                table: "EmailVerification",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Enrollments_UsersUserId",
+                name: "IX_Enrollments_CourseId",
                 table: "Enrollments",
-                column: "UsersUserId");
+                column: "CourseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Enrollments_UserId",
+                table: "Enrollments",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ExamResults_ExamScheduleId",
@@ -788,99 +795,99 @@ namespace EduPortal.Migrations
                 column: "ExamScheduleId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ExamResults_ExamTypesExamTypeId",
+                name: "IX_ExamResults_ExamTypeId",
                 table: "ExamResults",
-                column: "ExamTypesExamTypeId");
+                column: "ExamTypeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ExamResults_UsersUserId",
+                name: "IX_ExamResults_Lecturer",
                 table: "ExamResults",
-                column: "UsersUserId");
+                column: "Lecturer");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ExamSchedule_CourseLocationTypesLocationTypeId",
+                name: "IX_ExamSchedule_CourseId",
                 table: "ExamSchedule",
-                column: "CourseLocationTypesLocationTypeId");
+                column: "CourseId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ExamSchedule_CoursesCourseId",
+                name: "IX_ExamSchedule_ExamTypeId",
                 table: "ExamSchedule",
-                column: "CoursesCourseId");
+                column: "ExamTypeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ExamSchedule_ExamTypesExamTypeId",
+                name: "IX_ExamSchedule_Lecturer",
                 table: "ExamSchedule",
-                column: "ExamTypesExamTypeId");
+                column: "Lecturer");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ExamSchedule_UsersUserId",
+                name: "IX_ExamSchedule_LocationTypeId",
                 table: "ExamSchedule",
-                column: "UsersUserId");
+                column: "LocationTypeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ExceptionLogs_Inf_ErrorCodesCode",
+                name: "IX_ExceptionLogs_Code",
                 table: "ExceptionLogs",
-                column: "Inf_ErrorCodesCode");
+                column: "Code");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ExceptionLogs_UsersUserId",
+                name: "IX_ExceptionLogs_UserId",
                 table: "ExceptionLogs",
-                column: "UsersUserId");
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Notifications_NotificationTypesNotificationTypeId",
+                name: "IX_Notifications_NotificationTypeId",
                 table: "Notifications",
-                column: "NotificationTypesNotificationTypeId");
+                column: "NotificationTypeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Notifications_UsersUserId",
+                name: "IX_Notifications_UserId",
                 table: "Notifications",
-                column: "UsersUserId");
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserAchievements_AchievementsAchievementId",
+                name: "IX_UserAchievements_AchievementId",
                 table: "UserAchievements",
-                column: "AchievementsAchievementId");
+                column: "AchievementId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserAchievements_UsersUserId",
+                name: "IX_UserAchievements_UserId",
                 table: "UserAchievements",
-                column: "UsersUserId");
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Users_Inf_UserStatusesStatusId",
+                name: "IX_Users_StatusId",
                 table: "Users",
-                column: "Inf_UserStatusesStatusId");
+                column: "StatusId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UsersRoles_RolesRoleId",
+                name: "IX_UsersRoles_RoleId",
                 table: "UsersRoles",
-                column: "RolesRoleId");
+                column: "RoleId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UsersRoles_UsersUserId",
+                name: "IX_UsersRoles_UserId",
                 table: "UsersRoles",
-                column: "UsersUserId");
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UsersSessions_Inf_RestrictionLevelsRestrictionLevelId",
+                name: "IX_UsersSessions_RestrictionLevelId",
                 table: "UsersSessions",
-                column: "Inf_RestrictionLevelsRestrictionLevelId");
+                column: "RestrictionLevelId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UsersSessions_UsersUserId",
+                name: "IX_UsersSessions_UserId",
                 table: "UsersSessions",
-                column: "UsersUserId");
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserTokens_UsersSessionsUserSessionId",
+                name: "IX_UserTokens_SessionId",
                 table: "UserTokens",
-                column: "UsersSessionsUserSessionId");
+                column: "SessionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserTokens_UsersUserId",
+                name: "IX_UserTokens_UserId",
                 table: "UserTokens",
-                column: "UsersUserId");
+                column: "UserId");
         }
 
         /// <inheritdoc />
@@ -888,6 +895,9 @@ namespace EduPortal.Migrations
         {
             migrationBuilder.DropTable(
                 name: "CourseScheduleAttributes");
+
+            migrationBuilder.DropTable(
+                name: "EmailVerification");
 
             migrationBuilder.DropTable(
                 name: "Enrollments");

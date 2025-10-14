@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 
 namespace EduPortal.Models.Entities
@@ -23,7 +24,7 @@ namespace EduPortal.Models.Entities
 
         public int StatusId { get; set; }
 
-        public DateTime BirthDate { get; set; }
+        public DateTime? BirthDate { get; set; }
 
         public DateTime Created { get; set; } = DateTime.Now;
 
@@ -31,9 +32,12 @@ namespace EduPortal.Models.Entities
 
         public DateTime? LockedUntill { get; set; }
 
+        public bool IsVerified { get; set; } = false;
+
         // -------------------------------------------------------
 
-        public Inf_UserStatuses Inf_UserStatuses { get; set; }
+        [ForeignKey("StatusId")]
+        public Inf_UserStatuses UserStatus { get; set; }
 
         public List<UsersRoles> UsersRoles { get; set; }
 
