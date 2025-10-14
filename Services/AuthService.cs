@@ -109,14 +109,25 @@ namespace EduPortal.Services
                 Code = new Random().Next(10000, 99999)
             };
 
+            if(await _context.UsersRoles.FirstOrDefaultAsync(x => x.UserId == emailVerificator.UserId) is null)
+            {
+                var userRole = new UsersRoles
+                {
+                    UserId = emailVerificator.UserId,
+                    RoleId = 1
+                };
+
+                await _context.UsersRoles.AddAsync(userRole);
+            }
+
             try
             {
                 await _context.EmailVerification.AddAsync(emailVerificator);
                 await _context.SaveChangesAsync();
             }
-            catch
+            catch(Exception ex)
             {
-                return response.FailResponse("Failed to save in DB. AuthService - Register");
+                return response.FailResponse(ex.Message);
             }
             return response.SuccessResponse(model.Email, $"Code sent to the email {model.Email}");
         }
