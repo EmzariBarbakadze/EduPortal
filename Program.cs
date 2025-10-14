@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using EduPortal.Interfaces;
 using EduPortal.Middlewares;
+using EduPortal.Models.HelperClasses;
 
 namespace EduPortal
 {
@@ -48,6 +49,13 @@ namespace EduPortal
                 };
             }
             );
+
+            builder.Services.Configure<EmailSettings>(
+                builder.Configuration.GetSection("EmailSettings")
+            );
+
+            builder.Services.AddScoped<IEmailService, EmailService>();
+
 
             builder.Services.AddAuthorization();
 
