@@ -656,7 +656,7 @@ namespace EduPortal.Migrations
                 columns: new[] { "Code", "DescrEng", "DescrLocal", "IsActive" },
                 values: new object[,]
                 {
-                    { "1", "Unknown error", "უცნობი შეცდომა", true },
+                    { "0000", "Unknown error", "უცნობი შეცდომა", true },
                     { "1000", "Invalid parameter in the function", "არასწორი პარამეტრი ფუნქციაში", true },
                     { "1001", "Data not found", "მონაცემები ვერ მოიძებნა", true },
                     { "1002", "Invalid input data", "არასწორი შეყვანილი მონაცემები", true },

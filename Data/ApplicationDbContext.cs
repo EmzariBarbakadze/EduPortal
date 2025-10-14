@@ -70,7 +70,7 @@ namespace EduPortal.Data
             );
 
             modelBuilder.Entity<Inf_ErrorCodes>().HasData(
-                new Inf_ErrorCodes { Code = "1", DescrLocal = "უცნობი შეცდომა", DescrEng = "Unknown error", IsActive = true },
+                new Inf_ErrorCodes { Code = "0000", DescrLocal = "უცნობი შეცდომა", DescrEng = "Unknown error", IsActive = true },
                 new Inf_ErrorCodes { Code = "1000", DescrLocal = "არასწორი პარამეტრი ფუნქციაში", DescrEng = "Invalid parameter in the function", IsActive = true },
                 new Inf_ErrorCodes { Code = "1001", DescrLocal = "მონაცემები ვერ მოიძებნა", DescrEng = "Data not found", IsActive = true },
                 new Inf_ErrorCodes { Code = "1002", DescrLocal = "არასწორი შეყვანილი მონაცემები", DescrEng = "Invalid input data", IsActive = true },

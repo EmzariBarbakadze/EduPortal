@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EduPortal.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251014193114_InitialMigration")]
+    [Migration("20251014195246_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -562,7 +562,7 @@ namespace EduPortal.Migrations
                     b.HasData(
                         new
                         {
-                            Code = "1",
+                            Code = "0000",
                             DescrEng = "Unknown error",
                             DescrLocal = "უცნობი შეცდომა",
                             IsActive = true

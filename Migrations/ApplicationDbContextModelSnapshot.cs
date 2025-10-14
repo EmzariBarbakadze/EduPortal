@@ -559,7 +559,7 @@ namespace EduPortal.Migrations
                     b.HasData(
                         new
                         {
-                            Code = "1",
+                            Code = "0000",
                             DescrEng = "Unknown error",
                             DescrLocal = "უცნობი შეცდომა",
                             IsActive = true
