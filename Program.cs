@@ -8,6 +8,8 @@ using System.Text;
 using EduPortal.Interfaces;
 using EduPortal.Middlewares;
 using EduPortal.Models.HelperClasses;
+using Microsoft.AspNetCore.Identity;
+using EduPortal.Models.Entities;
 
 namespace EduPortal
 {
@@ -59,6 +61,7 @@ namespace EduPortal
 
             builder.Services.AddAuthorization();
 
+            builder.Services.AddScoped<IPasswordHasher<Users>, PasswordHasher<Users>>();
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IErrorLogger, ErrorLogger>();

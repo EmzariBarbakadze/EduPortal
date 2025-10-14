@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EduPortal.Models.Entities
 {
@@ -21,10 +22,13 @@ namespace EduPortal.Models.Entities
 
         // ---------------------------------------------------
 
-        public CourseSchedule CourseSchedule { get; set; }
+        [ForeignKey("CourseScheduleId")]
+        public CourseSchedule Schedule { get; set; }
 
-        public Inf_ActivityTypes activityTypes { get; set; }
+        [ForeignKey("ActivityTypeId")]
+        public Inf_ActivityTypes Activity { get; set; }
 
-        public Inf_Weekdays WeekDays { get; set; }
+        [ForeignKey("WeekDayId")]
+        public Inf_Weekdays WeekDay { get; set; }
     }
 }

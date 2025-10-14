@@ -26,7 +26,7 @@ namespace EduPortal.Middlewares
                 using var scope = _scopeFactory.CreateScope();
                 var errorLogger = scope.ServiceProvider.GetRequiredService<IErrorLogger>();
 
-                var userId = context.User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+                var userId = int.Parse(context.User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value);
                 await errorLogger.LogExceptionAsync(ex, context.Request.Path, userId);
 
                 context.Response.StatusCode = 500;

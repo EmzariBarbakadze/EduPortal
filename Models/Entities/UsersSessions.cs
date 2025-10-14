@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EduPortal.Models.Entities
 {
@@ -22,9 +23,11 @@ namespace EduPortal.Models.Entities
 
         // ----------------------------------------------------
 
-        public Users Users { get; set; }
+        [ForeignKey("UserId")]
+        public Users User { get; set; }
 
-        public Inf_RestrictionLevels Inf_RestrictionLevels { get; set; }
+        [ForeignKey("RestrictionLevelId")]
+        public Inf_RestrictionLevels RestrictionLevel { get; set; }
 
         public List<UserTokens> UserTokens { get; set; }
     }

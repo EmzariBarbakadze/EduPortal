@@ -70,19 +70,20 @@ namespace EduPortal.Data
             );
 
             modelBuilder.Entity<Inf_ErrorCodes>().HasData(
-                new Inf_ErrorCodes { Code = 1000, DescrLocal = "არასწორი პარამეტრი ფუნქციაში", DescrEng = "Invalid parameter in the function", IsActive = true },
-                new Inf_ErrorCodes { Code = 1001, DescrLocal = "მონაცემები ვერ მოიძებნა", DescrEng = "Data not found", IsActive = true },
-                new Inf_ErrorCodes { Code = 1002, DescrLocal = "არასწორი შეყვანილი მონაცემები", DescrEng = "Invalid input data", IsActive = true },
-                new Inf_ErrorCodes { Code = 1003, DescrLocal = "მომხმარებელი ვერ მოიძებნა", DescrEng = "User not found", IsActive = true },
-                new Inf_ErrorCodes { Code = 1004, DescrLocal = "პაროლი არასწორია", DescrEng = "Invalid password", IsActive = true },
-                new Inf_ErrorCodes { Code = 1005, DescrLocal = "წვდომა აკრძალულია", DescrEng = "Access denied", IsActive = true },
-                new Inf_ErrorCodes { Code = 1006, DescrLocal = "სესია დასრულებულია", DescrEng = "Session expired", IsActive = true },
-                new Inf_ErrorCodes { Code = 1007, DescrLocal = "მოთხოვნა არ არის ავტორიზებული", DescrEng = "Unauthorized request", IsActive = true },
-                new Inf_ErrorCodes { Code = 1008, DescrLocal = "მონაცემების დამუშავება ვერ მოხერხდა", DescrEng = "Data processing failed", IsActive = true },
-                new Inf_ErrorCodes { Code = 1009, DescrLocal = "სერვერი დროებით მიუწვდომელია", DescrEng = "Server temporarily unavailable", IsActive = true },
-                new Inf_ErrorCodes { Code = 1010, DescrLocal = "კურსი ვერ მოიძებნა", DescrEng = "Course not found", IsActive = true },
-                new Inf_ErrorCodes { Code = 1011, DescrLocal = "გამოცდა ვერ მოიძებნა", DescrEng = "Exam not found", IsActive = true },
-                new Inf_ErrorCodes { Code = 1012, DescrLocal = "მომხმარებელს უკვე აქვს რეგისტრაცია", DescrEng = "User already registered", IsActive = true }
+                new Inf_ErrorCodes { Code = "1", DescrLocal = "უცნობი შეცდომა", DescrEng = "Unknown error", IsActive = true },
+                new Inf_ErrorCodes { Code = "1000", DescrLocal = "არასწორი პარამეტრი ფუნქციაში", DescrEng = "Invalid parameter in the function", IsActive = true },
+                new Inf_ErrorCodes { Code = "1001", DescrLocal = "მონაცემები ვერ მოიძებნა", DescrEng = "Data not found", IsActive = true },
+                new Inf_ErrorCodes { Code = "1002", DescrLocal = "არასწორი შეყვანილი მონაცემები", DescrEng = "Invalid input data", IsActive = true },
+                new Inf_ErrorCodes { Code = "1003", DescrLocal = "მომხმარებელი ვერ მოიძებნა", DescrEng = "User not found", IsActive = true },
+                new Inf_ErrorCodes { Code = "1004", DescrLocal = "პაროლი არასწორია", DescrEng = "Invalid password", IsActive = true },
+                new Inf_ErrorCodes { Code = "1005", DescrLocal = "წვდომა აკრძალულია", DescrEng = "Access denied", IsActive = true },
+                new Inf_ErrorCodes { Code = "1006", DescrLocal = "სესია დასრულებულია", DescrEng = "Session expired", IsActive = true },
+                new Inf_ErrorCodes { Code = "1007", DescrLocal = "მოთხოვნა არ არის ავტორიზებული", DescrEng = "Unauthorized request", IsActive = true },
+                new Inf_ErrorCodes { Code = "1008", DescrLocal = "მონაცემების დამუშავება ვერ მოხერხდა", DescrEng = "Data processing failed", IsActive = true },
+                new Inf_ErrorCodes { Code = "1009", DescrLocal = "სერვერი დროებით მიუწვდომელია", DescrEng = "Server temporarily unavailable", IsActive = true },
+                new Inf_ErrorCodes { Code = "1010", DescrLocal = "კურსი ვერ მოიძებნა", DescrEng = "Course not found", IsActive = true },
+                new Inf_ErrorCodes { Code = "1011", DescrLocal = "გამოცდა ვერ მოიძებნა", DescrEng = "Exam not found", IsActive = true },
+                new Inf_ErrorCodes { Code = "1012", DescrLocal = "მომხმარებელს უკვე აქვს რეგისტრაცია", DescrEng = "User already registered", IsActive = true }
             );
 
             modelBuilder.Entity<Inf_ExamTypes>().HasData(

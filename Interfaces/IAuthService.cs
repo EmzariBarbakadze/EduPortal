@@ -6,7 +6,7 @@ namespace EduPortal.Interfaces
 {
     public interface IAuthService
     {
-        public Task<ServiceResponse<AuthResultDTO>> RegisterAsync(UserRegisterDTO model);
+        public Task<ServiceResponse<string>> RegisterAsync(UserRegisterDTO model);
 
         public Task<ServiceResponse<AuthResultDTO>> LoginAsync(UserLoginDTO model);
 

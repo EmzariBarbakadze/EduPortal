@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EduPortal.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250930110853_InitialMigration")]
+    [Migration("20251014193114_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -68,12 +68,6 @@ namespace EduPortal.Migrations
                     b.Property<int>("CourseId")
                         .HasColumnType("int");
 
-                    b.Property<int>("CourseLocationTypesLocationTypeId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CoursesCourseId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
@@ -94,9 +88,9 @@ namespace EduPortal.Migrations
 
                     b.HasKey("CourseScheduleId");
 
-                    b.HasIndex("CourseLocationTypesLocationTypeId");
+                    b.HasIndex("CourseId");
 
-                    b.HasIndex("CoursesCourseId");
+                    b.HasIndex("LocationTypeId");
 
                     b.ToTable("CourseSchedules");
                 });
@@ -127,19 +121,13 @@ namespace EduPortal.Migrations
                     b.Property<int>("WeekDayId")
                         .HasColumnType("int");
 
-                    b.Property<int>("WeekDaysWeekDayId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("activityTypesActivityTypeId")
-                        .HasColumnType("int");
-
                     b.HasKey("CourseScheduleAttributeId");
+
+                    b.HasIndex("ActivityTypeId");
 
                     b.HasIndex("CourseScheduleId");
 
-                    b.HasIndex("WeekDaysWeekDayId");
-
-                    b.HasIndex("activityTypesActivityTypeId");
+                    b.HasIndex("WeekDayId");
 
                     b.ToTable("CourseScheduleAttributes");
                 });
@@ -151,9 +139,6 @@ namespace EduPortal.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CourseId"));
-
-                    b.Property<int>("CourseCategoriesCourseCategoryId")
-                        .HasColumnType("int");
 
                     b.Property<int>("CourseCategoryId")
                         .HasColumnType("int");
@@ -183,16 +168,48 @@ namespace EduPortal.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UsersUserId")
-                        .HasColumnType("int");
-
                     b.HasKey("CourseId");
 
-                    b.HasIndex("CourseCategoriesCourseCategoryId");
+                    b.HasIndex("CourseCategoryId");
 
-                    b.HasIndex("UsersUserId");
+                    b.HasIndex("CreatorId");
 
                     b.ToTable("Courses");
+                });
+
+            modelBuilder.Entity("EduPortal.Models.Entities.EmailVerification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Code")
+                        .HasMaxLength(5)
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ExpirationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("EmailVerification");
                 });
 
             modelBuilder.Entity("EduPortal.Models.Entities.Enrollments", b =>
@@ -206,9 +223,6 @@ namespace EduPortal.Migrations
                     b.Property<int>("CourseId")
                         .HasColumnType("int");
 
-                    b.Property<int>("CoursesCourseId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
@@ -218,14 +232,11 @@ namespace EduPortal.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UsersUserId")
-                        .HasColumnType("int");
-
                     b.HasKey("EnrollmentId");
 
-                    b.HasIndex("CoursesCourseId");
+                    b.HasIndex("CourseId");
 
-                    b.HasIndex("UsersUserId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Enrollments");
                 });
@@ -247,9 +258,6 @@ namespace EduPortal.Migrations
                     b.Property<int>("ExamTypeId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ExamTypesExamTypeId")
-                        .HasColumnType("int");
-
                     b.Property<int>("Lecturer")
                         .HasColumnType("int");
 
@@ -259,16 +267,13 @@ namespace EduPortal.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UsersUserId")
-                        .HasColumnType("int");
-
                     b.HasKey("ExamResultId");
 
                     b.HasIndex("ExamScheduleId");
 
-                    b.HasIndex("ExamTypesExamTypeId");
+                    b.HasIndex("ExamTypeId");
 
-                    b.HasIndex("UsersUserId");
+                    b.HasIndex("Lecturer");
 
                     b.ToTable("ExamResults");
                 });
@@ -284,19 +289,10 @@ namespace EduPortal.Migrations
                     b.Property<int>("CourseId")
                         .HasColumnType("int");
 
-                    b.Property<int>("CourseLocationTypesLocationTypeId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CoursesCourseId")
-                        .HasColumnType("int");
-
                     b.Property<int>("EndDate")
                         .HasColumnType("int");
 
                     b.Property<int>("ExamTypeId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ExamTypesExamTypeId")
                         .HasColumnType("int");
 
                     b.Property<int>("Lecturer")
@@ -311,58 +307,70 @@ namespace EduPortal.Migrations
                     b.Property<int>("StartDate")
                         .HasColumnType("int");
 
-                    b.Property<int>("UsersUserId")
-                        .HasColumnType("int");
-
                     b.HasKey("ExamScheduleId");
 
-                    b.HasIndex("CourseLocationTypesLocationTypeId");
+                    b.HasIndex("CourseId");
 
-                    b.HasIndex("CoursesCourseId");
+                    b.HasIndex("ExamTypeId");
 
-                    b.HasIndex("ExamTypesExamTypeId");
+                    b.HasIndex("Lecturer");
 
-                    b.HasIndex("UsersUserId");
+                    b.HasIndex("LocationTypeId");
 
                     b.ToTable("ExamSchedule");
                 });
 
             modelBuilder.Entity("EduPortal.Models.Entities.ExceptionLogs", b =>
                 {
-                    b.Property<int>("LogId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LogId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("Code")
-                        .HasColumnType("int");
+                    b.Property<string>("Code")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
+                    b.Property<string>("Details")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Inf_ErrorCodesCode")
-                        .HasColumnType("int");
-
-                    b.Property<string>("IpAdress")
-                        .IsRequired()
+                    b.Property<string>("DeviceInfo")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserId")
+                    b.Property<string>("IpAddress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Layer")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Method")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Path")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Source")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("StackTrace")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("UserId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UsersUserId")
-                        .HasColumnType("int");
+                    b.HasKey("Id");
 
-                    b.HasKey("LogId");
+                    b.HasIndex("Code");
 
-                    b.HasIndex("Inf_ErrorCodesCode");
-
-                    b.HasIndex("UsersUserId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("ExceptionLogs");
                 });
@@ -533,11 +541,8 @@ namespace EduPortal.Migrations
 
             modelBuilder.Entity("EduPortal.Models.Entities.Inf_ErrorCodes", b =>
                 {
-                    b.Property<int>("Code")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Code"));
+                    b.Property<string>("Code")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("DescrEng")
                         .IsRequired()
@@ -557,91 +562,98 @@ namespace EduPortal.Migrations
                     b.HasData(
                         new
                         {
-                            Code = 1000,
-                            DescrEng = "General system error",
-                            DescrLocal = "ზოგადი შეცდომა",
+                            Code = "1",
+                            DescrEng = "Unknown error",
+                            DescrLocal = "უცნობი შეცდომა",
                             IsActive = true
                         },
                         new
                         {
-                            Code = 1001,
+                            Code = "1000",
+                            DescrEng = "Invalid parameter in the function",
+                            DescrLocal = "არასწორი პარამეტრი ფუნქციაში",
+                            IsActive = true
+                        },
+                        new
+                        {
+                            Code = "1001",
                             DescrEng = "Data not found",
                             DescrLocal = "მონაცემები ვერ მოიძებნა",
                             IsActive = true
                         },
                         new
                         {
-                            Code = 1002,
+                            Code = "1002",
                             DescrEng = "Invalid input data",
                             DescrLocal = "არასწორი შეყვანილი მონაცემები",
                             IsActive = true
                         },
                         new
                         {
-                            Code = 1003,
+                            Code = "1003",
                             DescrEng = "User not found",
                             DescrLocal = "მომხმარებელი ვერ მოიძებნა",
                             IsActive = true
                         },
                         new
                         {
-                            Code = 1004,
+                            Code = "1004",
                             DescrEng = "Invalid password",
                             DescrLocal = "პაროლი არასწორია",
                             IsActive = true
                         },
                         new
                         {
-                            Code = 1005,
+                            Code = "1005",
                             DescrEng = "Access denied",
                             DescrLocal = "წვდომა აკრძალულია",
                             IsActive = true
                         },
                         new
                         {
-                            Code = 1006,
+                            Code = "1006",
                             DescrEng = "Session expired",
                             DescrLocal = "სესია დასრულებულია",
                             IsActive = true
                         },
                         new
                         {
-                            Code = 1007,
+                            Code = "1007",
                             DescrEng = "Unauthorized request",
                             DescrLocal = "მოთხოვნა არ არის ავტორიზებული",
                             IsActive = true
                         },
                         new
                         {
-                            Code = 1008,
+                            Code = "1008",
                             DescrEng = "Data processing failed",
                             DescrLocal = "მონაცემების დამუშავება ვერ მოხერხდა",
                             IsActive = true
                         },
                         new
                         {
-                            Code = 1009,
+                            Code = "1009",
                             DescrEng = "Server temporarily unavailable",
                             DescrLocal = "სერვერი დროებით მიუწვდომელია",
                             IsActive = true
                         },
                         new
                         {
-                            Code = 1010,
+                            Code = "1010",
                             DescrEng = "Course not found",
                             DescrLocal = "კურსი ვერ მოიძებნა",
                             IsActive = true
                         },
                         new
                         {
-                            Code = 1011,
+                            Code = "1011",
                             DescrEng = "Exam not found",
                             DescrLocal = "გამოცდა ვერ მოიძებნა",
                             IsActive = true
                         },
                         new
                         {
-                            Code = 1012,
+                            Code = "1012",
                             DescrEng = "User already registered",
                             DescrLocal = "მომხმარებელს უკვე აქვს რეგისტრაცია",
                             IsActive = true
@@ -858,8 +870,8 @@ namespace EduPortal.Migrations
                         new
                         {
                             StatusId = 5,
-                            DescrEng = "Registered (Unconfirmed)",
-                            DescrLocal = "დარეგისტრირებული, დაუდასტურებელი",
+                            DescrEng = "Unverified",
+                            DescrLocal = "დაუდასტურებელი",
                             IsActive = true
                         },
                         new
@@ -957,20 +969,14 @@ namespace EduPortal.Migrations
                     b.Property<int>("NotificationTypeId")
                         .HasColumnType("int");
 
-                    b.Property<int>("NotificationTypesNotificationTypeId")
-                        .HasColumnType("int");
-
                     b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UsersUserId")
                         .HasColumnType("int");
 
                     b.HasKey("NotificationId");
 
-                    b.HasIndex("NotificationTypesNotificationTypeId");
+                    b.HasIndex("NotificationTypeId");
 
-                    b.HasIndex("UsersUserId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Notifications");
                 });
@@ -1040,9 +1046,6 @@ namespace EduPortal.Migrations
                     b.Property<int>("AchievementId")
                         .HasColumnType("int");
 
-                    b.Property<int>("AchievementsAchievementId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
@@ -1052,14 +1055,11 @@ namespace EduPortal.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UsersUserId")
-                        .HasColumnType("int");
-
                     b.HasKey("UserAchievementId");
 
-                    b.HasIndex("AchievementsAchievementId");
+                    b.HasIndex("AchievementId");
 
-                    b.HasIndex("UsersUserId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("UserAchievements");
                 });
@@ -1076,18 +1076,13 @@ namespace EduPortal.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("DeviceInfo")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("ExpiresAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("IpAdress")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsUsed")
-                        .HasColumnType("bit");
 
                     b.Property<int>("JwtId")
                         .HasColumnType("int");
@@ -1096,7 +1091,7 @@ namespace EduPortal.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("RewokedAt")
+                    b.Property<DateTime?>("RevokedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<int?>("SessionId")
@@ -1105,17 +1100,11 @@ namespace EduPortal.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UsersSessionsUserSessionId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UsersUserId")
-                        .HasColumnType("int");
-
                     b.HasKey("TokenId");
 
-                    b.HasIndex("UsersSessionsUserSessionId");
+                    b.HasIndex("SessionId");
 
-                    b.HasIndex("UsersUserId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("UserTokens");
                 });
@@ -1128,6 +1117,9 @@ namespace EduPortal.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"));
 
+                    b.Property<DateTime?>("BirthDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
@@ -1139,10 +1131,10 @@ namespace EduPortal.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Inf_UserStatusesStatusId")
-                        .HasColumnType("int");
-
                     b.Property<bool>("IsLocked")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsVerified")
                         .HasColumnType("bit");
 
                     b.Property<string>("LastName")
@@ -1165,7 +1157,7 @@ namespace EduPortal.Migrations
 
                     b.HasKey("UserId");
 
-                    b.HasIndex("Inf_UserStatusesStatusId");
+                    b.HasIndex("StatusId");
 
                     b.ToTable("Users");
                 });
@@ -1187,20 +1179,14 @@ namespace EduPortal.Migrations
                     b.Property<int>("RoleId")
                         .HasColumnType("int");
 
-                    b.Property<int>("RolesRoleId")
-                        .HasColumnType("int");
-
                     b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UsersUserId")
                         .HasColumnType("int");
 
                     b.HasKey("UserRoleId");
 
-                    b.HasIndex("RolesRoleId");
+                    b.HasIndex("RoleId");
 
-                    b.HasIndex("UsersUserId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("UsersRoles");
                 });
@@ -1219,9 +1205,6 @@ namespace EduPortal.Migrations
                     b.Property<DateTime>("DateStart")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Inf_RestrictionLevelsRestrictionLevelId")
-                        .HasColumnType("int");
-
                     b.Property<string>("IpAdress")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -1232,290 +1215,292 @@ namespace EduPortal.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UsersUserId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("ValidTill")
                         .HasColumnType("datetime2");
 
                     b.HasKey("UserSessionId");
 
-                    b.HasIndex("Inf_RestrictionLevelsRestrictionLevelId");
+                    b.HasIndex("RestrictionLevelId");
 
-                    b.HasIndex("UsersUserId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("UsersSessions");
                 });
 
             modelBuilder.Entity("EduPortal.Models.Entities.CourseSchedule", b =>
                 {
-                    b.HasOne("EduPortal.Models.Entities.Inf_CourseLocationTypes", "CourseLocationTypes")
+                    b.HasOne("EduPortal.Models.Entities.Courses", "Course")
                         .WithMany("CourseSchedules")
-                        .HasForeignKey("CourseLocationTypesLocationTypeId")
+                        .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("EduPortal.Models.Entities.Courses", "Courses")
+                    b.HasOne("EduPortal.Models.Entities.Inf_CourseLocationTypes", "LocationType")
                         .WithMany("CourseSchedules")
-                        .HasForeignKey("CoursesCourseId")
+                        .HasForeignKey("LocationTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("CourseLocationTypes");
+                    b.Navigation("Course");
 
-                    b.Navigation("Courses");
+                    b.Navigation("LocationType");
                 });
 
             modelBuilder.Entity("EduPortal.Models.Entities.CourseScheduleAttributes", b =>
                 {
-                    b.HasOne("EduPortal.Models.Entities.CourseSchedule", "CourseSchedule")
+                    b.HasOne("EduPortal.Models.Entities.Inf_ActivityTypes", "Activity")
+                        .WithMany("CourseScheduleAttributes")
+                        .HasForeignKey("ActivityTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EduPortal.Models.Entities.CourseSchedule", "Schedule")
                         .WithMany("CourseScheduleAttributes")
                         .HasForeignKey("CourseScheduleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("EduPortal.Models.Entities.Inf_Weekdays", "WeekDays")
+                    b.HasOne("EduPortal.Models.Entities.Inf_Weekdays", "WeekDay")
                         .WithMany("CourseScheduleAttributes")
-                        .HasForeignKey("WeekDaysWeekDayId")
+                        .HasForeignKey("WeekDayId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("EduPortal.Models.Entities.Inf_ActivityTypes", "activityTypes")
-                        .WithMany("CourseScheduleAttributes")
-                        .HasForeignKey("activityTypesActivityTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("Activity");
 
-                    b.Navigation("CourseSchedule");
+                    b.Navigation("Schedule");
 
-                    b.Navigation("WeekDays");
-
-                    b.Navigation("activityTypes");
+                    b.Navigation("WeekDay");
                 });
 
             modelBuilder.Entity("EduPortal.Models.Entities.Courses", b =>
                 {
-                    b.HasOne("EduPortal.Models.Entities.Inf_CourseCategories", "CourseCategories")
+                    b.HasOne("EduPortal.Models.Entities.Inf_CourseCategories", "Categories")
                         .WithMany("Courses")
-                        .HasForeignKey("CourseCategoriesCourseCategoryId")
+                        .HasForeignKey("CourseCategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("EduPortal.Models.Entities.Users", "Users")
+                    b.HasOne("EduPortal.Models.Entities.Users", "Creator")
                         .WithMany("Course")
-                        .HasForeignKey("UsersUserId")
+                        .HasForeignKey("CreatorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("CourseCategories");
+                    b.Navigation("Categories");
 
-                    b.Navigation("Users");
+                    b.Navigation("Creator");
+                });
+
+            modelBuilder.Entity("EduPortal.Models.Entities.EmailVerification", b =>
+                {
+                    b.HasOne("EduPortal.Models.Entities.Users", "User")
+                        .WithMany("EmailVerifications")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("EduPortal.Models.Entities.Enrollments", b =>
                 {
-                    b.HasOne("EduPortal.Models.Entities.Courses", "Courses")
+                    b.HasOne("EduPortal.Models.Entities.Courses", "Course")
                         .WithMany("Enrollments")
-                        .HasForeignKey("CoursesCourseId")
+                        .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("EduPortal.Models.Entities.Users", "Users")
+                    b.HasOne("EduPortal.Models.Entities.Users", "User")
                         .WithMany("Enrollments")
-                        .HasForeignKey("UsersUserId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Courses");
+                    b.Navigation("Course");
 
-                    b.Navigation("Users");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("EduPortal.Models.Entities.ExamResults", b =>
                 {
-                    b.HasOne("EduPortal.Models.Entities.ExamSchedule", "ExamSchedules")
+                    b.HasOne("EduPortal.Models.Entities.ExamSchedule", "Schedule")
                         .WithMany("ExamResults")
                         .HasForeignKey("ExamScheduleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("EduPortal.Models.Entities.Inf_ExamTypes", "ExamTypes")
+                    b.HasOne("EduPortal.Models.Entities.Inf_ExamTypes", "ExamType")
                         .WithMany("ExamResults")
-                        .HasForeignKey("ExamTypesExamTypeId")
+                        .HasForeignKey("ExamTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("EduPortal.Models.Entities.Users", "Users")
+                    b.HasOne("EduPortal.Models.Entities.Users", "User")
                         .WithMany()
-                        .HasForeignKey("UsersUserId")
+                        .HasForeignKey("Lecturer")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("ExamSchedules");
+                    b.Navigation("ExamType");
 
-                    b.Navigation("ExamTypes");
+                    b.Navigation("Schedule");
 
-                    b.Navigation("Users");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("EduPortal.Models.Entities.ExamSchedule", b =>
                 {
-                    b.HasOne("EduPortal.Models.Entities.Inf_CourseLocationTypes", "CourseLocationTypes")
+                    b.HasOne("EduPortal.Models.Entities.Courses", "Course")
                         .WithMany("ExamSchedules")
-                        .HasForeignKey("CourseLocationTypesLocationTypeId")
+                        .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("EduPortal.Models.Entities.Courses", "Courses")
+                    b.HasOne("EduPortal.Models.Entities.Inf_ExamTypes", "ExamType")
                         .WithMany("ExamSchedules")
-                        .HasForeignKey("CoursesCourseId")
+                        .HasForeignKey("ExamTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("EduPortal.Models.Entities.Inf_ExamTypes", "ExamTypes")
+                    b.HasOne("EduPortal.Models.Entities.Users", "User")
                         .WithMany("ExamSchedules")
-                        .HasForeignKey("ExamTypesExamTypeId")
+                        .HasForeignKey("Lecturer")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("EduPortal.Models.Entities.Users", "Users")
+                    b.HasOne("EduPortal.Models.Entities.Inf_CourseLocationTypes", "CourseLocationType")
                         .WithMany("ExamSchedules")
-                        .HasForeignKey("UsersUserId")
+                        .HasForeignKey("LocationTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("CourseLocationTypes");
+                    b.Navigation("Course");
 
-                    b.Navigation("Courses");
+                    b.Navigation("CourseLocationType");
 
-                    b.Navigation("ExamTypes");
+                    b.Navigation("ExamType");
 
-                    b.Navigation("Users");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("EduPortal.Models.Entities.ExceptionLogs", b =>
                 {
-                    b.HasOne("EduPortal.Models.Entities.Inf_ErrorCodes", "Inf_ErrorCodes")
+                    b.HasOne("EduPortal.Models.Entities.Inf_ErrorCodes", "ErrorCode")
                         .WithMany("ExceptionLogs")
-                        .HasForeignKey("Inf_ErrorCodesCode")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("Code");
 
-                    b.HasOne("EduPortal.Models.Entities.Users", "Users")
+                    b.HasOne("EduPortal.Models.Entities.Users", "User")
                         .WithMany("ExceptionLogs")
-                        .HasForeignKey("UsersUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
 
-                    b.Navigation("Inf_ErrorCodes");
+                    b.Navigation("ErrorCode");
 
-                    b.Navigation("Users");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("EduPortal.Models.Entities.Notifications", b =>
                 {
-                    b.HasOne("EduPortal.Models.Entities.Inf_NotificationTypes", "NotificationTypes")
+                    b.HasOne("EduPortal.Models.Entities.Inf_NotificationTypes", "NotificationType")
                         .WithMany("Notifications")
-                        .HasForeignKey("NotificationTypesNotificationTypeId")
+                        .HasForeignKey("NotificationTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("EduPortal.Models.Entities.Users", "Users")
+                    b.HasOne("EduPortal.Models.Entities.Users", "User")
                         .WithMany()
-                        .HasForeignKey("UsersUserId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("NotificationTypes");
+                    b.Navigation("NotificationType");
 
-                    b.Navigation("Users");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("EduPortal.Models.Entities.UserAchievements", b =>
                 {
-                    b.HasOne("EduPortal.Models.Entities.Achievements", "Achievements")
+                    b.HasOne("EduPortal.Models.Entities.Achievements", "Achievement")
                         .WithMany("UserAchievements")
-                        .HasForeignKey("AchievementsAchievementId")
+                        .HasForeignKey("AchievementId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("EduPortal.Models.Entities.Users", "Users")
+                    b.HasOne("EduPortal.Models.Entities.Users", "User")
                         .WithMany("UserAchievements")
-                        .HasForeignKey("UsersUserId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Achievements");
+                    b.Navigation("Achievement");
 
-                    b.Navigation("Users");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("EduPortal.Models.Entities.UserTokens", b =>
                 {
-                    b.HasOne("EduPortal.Models.Entities.UsersSessions", "UsersSessions")
+                    b.HasOne("EduPortal.Models.Entities.UsersSessions", "Session")
                         .WithMany("UserTokens")
-                        .HasForeignKey("UsersSessionsUserSessionId")
+                        .HasForeignKey("SessionId");
+
+                    b.HasOne("EduPortal.Models.Entities.Users", "User")
+                        .WithMany("UserTokens")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("EduPortal.Models.Entities.Users", "Users")
-                        .WithMany("UserTokens")
-                        .HasForeignKey("UsersUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("Session");
 
-                    b.Navigation("Users");
-
-                    b.Navigation("UsersSessions");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("EduPortal.Models.Entities.Users", b =>
                 {
-                    b.HasOne("EduPortal.Models.Entities.Inf_UserStatuses", "Inf_UserStatuses")
+                    b.HasOne("EduPortal.Models.Entities.Inf_UserStatuses", "UserStatus")
                         .WithMany("Users")
-                        .HasForeignKey("Inf_UserStatusesStatusId")
+                        .HasForeignKey("StatusId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Inf_UserStatuses");
+                    b.Navigation("UserStatus");
                 });
 
             modelBuilder.Entity("EduPortal.Models.Entities.UsersRoles", b =>
                 {
-                    b.HasOne("EduPortal.Models.Entities.Roles", "Roles")
+                    b.HasOne("EduPortal.Models.Entities.Roles", "Role")
                         .WithMany("UsersRoles")
-                        .HasForeignKey("RolesRoleId")
+                        .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("EduPortal.Models.Entities.Users", "Users")
+                    b.HasOne("EduPortal.Models.Entities.Users", "User")
                         .WithMany("UsersRoles")
-                        .HasForeignKey("UsersUserId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Roles");
+                    b.Navigation("Role");
 
-                    b.Navigation("Users");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("EduPortal.Models.Entities.UsersSessions", b =>
                 {
-                    b.HasOne("EduPortal.Models.Entities.Inf_RestrictionLevels", "Inf_RestrictionLevels")
+                    b.HasOne("EduPortal.Models.Entities.Inf_RestrictionLevels", "RestrictionLevel")
                         .WithMany("UsersSessions")
-                        .HasForeignKey("Inf_RestrictionLevelsRestrictionLevelId")
+                        .HasForeignKey("RestrictionLevelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("EduPortal.Models.Entities.Users", "Users")
+                    b.HasOne("EduPortal.Models.Entities.Users", "User")
                         .WithMany("UsersSessions")
-                        .HasForeignKey("UsersUserId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Inf_RestrictionLevels");
+                    b.Navigation("RestrictionLevel");
 
-                    b.Navigation("Users");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("EduPortal.Models.Entities.Achievements", b =>
@@ -1599,6 +1584,8 @@ namespace EduPortal.Migrations
             modelBuilder.Entity("EduPortal.Models.Entities.Users", b =>
                 {
                     b.Navigation("Course");
+
+                    b.Navigation("EmailVerifications");
 
                     b.Navigation("Enrollments");
 
