@@ -100,20 +100,19 @@ namespace EduPortal.Services
                     return response.FailResponse(ex.Message);
                 }
             }
-                      
+
+            var id = user?.UserId ?? newUser.UserId;
 
             var emailVerificator = new EmailVerification 
-            { 
-                UserId = user?.UserId ?? newUser.UserId,
-                Email = model.Email,
-                Code = new Random().Next(10000, 99999)
+            {
+                
             };
 
-            if(await _context.UsersRoles.FirstOrDefaultAsync(x => x.UserId == emailVerificator.UserId) is null)
+            if(await _context.UsersRoles.FirstOrDefaultAsync(x => x.UserId == id) is null)
             {
                 var userRole = new UsersRoles
                 {
-                    UserId = emailVerificator.UserId,
+                    UserId = id,
                     RoleId = 1
                 };
 
@@ -122,19 +121,90 @@ namespace EduPortal.Services
 
             try
             {
-                await _context.EmailVerification.AddAsync(emailVerificator);
                 await _context.SaveChangesAsync();
             }
             catch(Exception ex)
             {
                 return response.FailResponse(ex.Message);
             }
+
             return response.SuccessResponse(model.Email, $"Code sent to the email {model.Email}");
         }
 
-        public Task<Users?> ValidateUserAsync(string username, string password)
+        public async Task<ServiceResponse<AuthResultDTO>> VerifyEmail(string email, int code)
         {
-            throw new NotImplementedException();
+            var response = new ServiceResponse<AuthResultDTO>();
+
+            if (email is null)
+            {
+                await _logger.LogServiceErrorAsync(
+                    "1000",
+                    "Parameter for RegisterAsync can not be null",
+                    "Service",
+                    "RegisterAsync",
+                    null
+                    );
+                return response.FailResponse("Parameter for VerifyEmail can not be null");
+            }
+
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == model.Email && x.IsVerified == false);
+            var newUser = new Users();
+
+            if (user is not null)
+            {
+                user.FirstName = model.FirstName;
+                user.LastName = model.LastName;
+                user.UserName = model.Email.Split('@')[0];
+                user.PasswordHash = _hasher.HashPassword(user, model.Password);
+                user.StatusId = 5;
+            }
+            else
+            {
+                newUser = new Users
+                {
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    Email = model.Email,
+                    UserName = model.Email.Split('@')[0],
+                    StatusId = 5
+                };
+
+                newUser.PasswordHash = _hasher.HashPassword(newUser, model.Password);
+
+                await _context.Users.AddAsync(newUser);
+                try
+                {
+                    await _context.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    return response.FailResponse(ex.Message);
+                }
+            }
+
+            var id = user?.UserId ?? newUser.UserId;
+
+            if (await _context.UsersRoles.FirstOrDefaultAsync(x => x.UserId == id) is null)
+            {
+                var userRole = new UsersRoles
+                {
+                    UserId = id,
+                    RoleId = 1
+                };
+
+                await _context.UsersRoles.AddAsync(userRole);
+            }
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                return response.FailResponse(ex.Message);
+            }
+
+            return response.SuccessResponse(model.Email, $"Code sent to the email {model.Email}");
         }
     }
 }

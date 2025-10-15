@@ -43,13 +43,32 @@ namespace EduPortal.Controllers
                 return BadRequest(response.Message);
             }
 
-            return Ok(response.Data);
+            return Ok(response);
         }
 
         [HttpPost("VerifyEmail")]
         public async Task<IActionResult> VerifyEmail(string email, int code)
         {
-            return Ok();
+            if (!ModelState.IsValid)
+            {
+                await _logger.LogServiceErrorAsync(
+                    "1000",
+                    "Modelstate is not valid in Register controller",
+                    "Controller",
+                    "Register",
+                    null
+                );
+                return BadRequest(ModelState);
+            }
+
+            var response = await _authService.VerifyEmail(email, code);
+
+            if (!response.Success)
+            {
+                return BadRequest(response.Message);
+            }
+
+            return Ok(response);
         }
 
         [HttpPost("ResendCode")]

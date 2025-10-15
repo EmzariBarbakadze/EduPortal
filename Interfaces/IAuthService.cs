@@ -14,6 +14,6 @@ namespace EduPortal.Interfaces
 
         public Task<ServiceResponse<bool>> LogoutAsync(int userId);
 
-        public Task<Users?> ValidateUserAsync(string username, string password);
+        public Task<ServiceResponse<AuthResultDTO>> VerifyEmail(string email, int code);
     }
 }
