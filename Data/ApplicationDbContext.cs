@@ -99,7 +99,8 @@ namespace EduPortal.Data
                 new Inf_NotificationTypes { NotificationTypeId = 4, DescrLocal = "კურსში ახალი მასალა აიტვირთა", DescrEng = "New course material", IsActive = true },
                 new Inf_NotificationTypes { NotificationTypeId = 5, DescrLocal = "შეფასება გამოქვეყნდა", DescrEng = "Grade published", IsActive = true },
                 new Inf_NotificationTypes { NotificationTypeId = 6, DescrLocal = "ახალი შეტყობინება მიღებულია", DescrEng = "New message received", IsActive = true },
-                new Inf_NotificationTypes { NotificationTypeId = 7, DescrLocal = "დავალების ვადა ახლოვდება", DescrEng = "Assignment due reminder", IsActive = true }
+                new Inf_NotificationTypes { NotificationTypeId = 7, DescrLocal = "დავალების ვადა ახლოვდება", DescrEng = "Assignment due reminder", IsActive = true },
+                new Inf_NotificationTypes { NotificationTypeId = 8, DescrLocal = "ვერიფიკაციის პინ კოდი", DescrEng = "Verification pin code", IsActive = true }
             );
 
             modelBuilder.Entity<Inf_RestrictionLevels>().HasData(

@@ -192,6 +192,7 @@ namespace EduPortal.Migrations
                     StatusId = table.Column<int>(type: "int", nullable: false),
                     BirthDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LoginFailCounter = table.Column<int>(type: "int", nullable: false),
                     IsLocked = table.Column<bool>(type: "bit", nullable: false),
                     LockedUntill = table.Column<DateTime>(type: "datetime2", nullable: true),
                     IsVerified = table.Column<bool>(type: "bit", nullable: false)
@@ -391,8 +392,9 @@ namespace EduPortal.Migrations
                     UserId = table.Column<int>(type: "int", nullable: false),
                     DateStart = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DateEnd = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ValidTill = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IpAdress = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ValidTill = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IpAdress = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DeviceInfo = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     RestrictionLevelId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -693,7 +695,8 @@ namespace EduPortal.Migrations
                     { 4, "New course material", "კურსში ახალი მასალა აიტვირთა", true },
                     { 5, "Grade published", "შეფასება გამოქვეყნდა", true },
                     { 6, "New message received", "ახალი შეტყობინება მიღებულია", true },
-                    { 7, "Assignment due reminder", "დავალების ვადა ახლოვდება", true }
+                    { 7, "Assignment due reminder", "დავალების ვადა ახლოვდება", true },
+                    { 8, "Verification pin code", "ვერიფიკაციის პინ კოდი", true }
                 });
 
             migrationBuilder.InsertData(

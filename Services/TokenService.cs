@@ -19,7 +19,7 @@ namespace EduPortal.Services
             _context = context;
         }
 
-        public string GenerateAccessToken(Users user, List<string> roles)
+        public string GenerateAccessToken(Users user, List<int> roles)
         {
             var jwtSettings = _config.GetSection("JwtSettings");
             var expireMinutes = double.Parse(jwtSettings["AccessTokenExpiresMinutes"]!);
@@ -33,7 +33,7 @@ namespace EduPortal.Services
 
             foreach (var role in roles)
             {
-                claims.Add(new Claim(ClaimTypes.Role, role));
+                claims.Add(new Claim(ClaimTypes.Role, role.ToString()));
             }
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]!));

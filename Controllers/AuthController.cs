@@ -1,6 +1,7 @@
 ﻿using EduPortal.Interfaces;
 using EduPortal.Models.DTOs;
 using EduPortal.Models.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
@@ -78,9 +79,28 @@ namespace EduPortal.Controllers
         }
 
         [HttpPost("Login")]
-        public async Task<IActionResult> Login()
+        public async Task<IActionResult> Login(UserLoginDTO dto)
         {
-            return Ok();
+            if (!ModelState.IsValid)
+            {
+                await _logger.LogServiceErrorAsync(
+                    "1000",
+                    "Modelstate is not valid in Login controller",
+                    "Controller",
+                    "Login",
+                    null
+                );
+                return BadRequest(ModelState);
+            }
+
+            var response = await _authService.LoginAsync(dto);
+
+            if (!response.Success)
+            {
+                return BadRequest(response.Message);
+            }
+
+            return Ok(response);
         }
 
         [HttpPost("Logout")]

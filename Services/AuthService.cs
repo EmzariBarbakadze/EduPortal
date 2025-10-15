@@ -1,10 +1,13 @@
-﻿using EduPortal.Data;
+﻿using Azure;
+using EduPortal.Data;
 using EduPortal.Interfaces;
 using EduPortal.Models.DTOs;
 using EduPortal.Models.Entities;
 using EduPortal.Models.HelperClasses;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.IdentityModel.Tokens.Jwt;
+using System.Net.WebSockets;
 
 namespace EduPortal.Services
 {
@@ -14,18 +17,150 @@ namespace EduPortal.Services
         private readonly ITokenService _token;
         private readonly IErrorLogger _logger;
         private readonly IPasswordHasher<Users> _hasher;
+        private readonly IEmailService _emailService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public AuthService(ApplicationDbContext context, ITokenService token, IErrorLogger logger, IPasswordHasher<Users> hasher)
+        public AuthService(ApplicationDbContext context, ITokenService token, IErrorLogger logger, IPasswordHasher<Users> hasher, IEmailService emailService, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             _token = token;
             _logger = logger;
             _hasher = hasher;
+            _emailService = emailService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
-        public Task<ServiceResponse<AuthResultDTO>> LoginAsync(UserLoginDTO model)
+        public async Task<ServiceResponse<AuthResultDTO>> LoginAsync(UserLoginDTO model)
         {
-            throw new NotImplementedException();
+            var response = new ServiceResponse<AuthResultDTO>();
+
+            if(model is null)
+            {
+                await _logger.LogServiceErrorAsync(
+                    "1000",
+                    "Parameter for LoginAsync can not be null",
+                    "Service",
+                    "LoginAsync",
+                    null
+                    );
+
+                return response.FailResponse("Parameter for LoginAsync can not be null");
+            }
+
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.UserName == model.UserName);
+
+            if(user is null)
+            {
+                return response.FailResponse("User with given username can not be found");
+            }
+
+            if(user.IsLocked && user.LockedUntill >= DateTime.Now)
+            {
+                return response.FailResponse($"The user account is locked untill {user.LockedUntill}");
+            }
+
+            if(user.LockedUntill < DateTime.Now && user.IsLocked)
+            {
+                user.LoginFailCounter = 0;
+                user.IsLocked = false;
+                user.LockedUntill = null;
+
+                await _context.SaveChangesAsync();
+            }
+
+            if(user.PasswordHash != _hasher.HashPassword(user, model.Password))
+            {
+                user.LoginFailCounter++;
+
+                if(user.LoginFailCounter >= 5)
+                {
+                    user.IsLocked = true;
+                    user.LockedUntill = DateTime.Now.AddMinutes(5);
+
+                    var subject = "Your EduPortal Account Has Been Locked";
+                    var body = $@"<html>
+                                  <body style='font-family: Arial, sans-serif; color: #333;'>
+                                    <h2 style='color:#0078D4;'>Account Locked for Security Reasons</h2>
+                                    <p>Dear {user.FirstName},</p>
+                                    <p>Your EduPortal account has been temporarily locked after multiple failed login attempts.</p>
+                                    <p>Locked untill {user.LockedUntill}</p>
+                                    <p>If you didn’t try to sign in, you can ignore this email.</p>
+                                    <hr style='border:none; border-top:1px solid #ccc;' />
+                                    <p style='font-size:12px; color:#777;'>This is an automated message. Please do not reply.</p>
+                                  </body>
+                                </html>";
+
+                    try
+                    {
+                        await _emailService.SendEmailAsync(user.Email, subject, body);
+                    }
+                    catch(Exception ex)
+                    {
+                        await _logger.LogServiceErrorAsync(
+                        "1000",
+                        $"Email could not be sent to {user.Email}",
+                        "Service",
+                        "LoginAsync",
+                        null
+                        );
+
+                        return response.FailResponse(ex.Message);
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+                return response.FailResponse("Incorrect Password");
+            }
+
+            try
+            {
+                // Register the session
+
+                var ipAddress = _httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress?.ToString();
+                var deviceInfo = _httpContextAccessor.HttpContext?.Request?.Headers["User-Agent"].ToString();
+
+                var session = new UsersSessions
+                {
+                    UserId = user.UserId,
+                    DateStart = DateTime.Now,
+                    IpAdress = ipAddress,
+                    RestrictionLevelId = 1,
+                    DeviceInfo = deviceInfo
+                };
+
+                await _context.UsersSessions.AddAsync(session);
+                await _context.SaveChangesAsync();
+
+                // Create Access and Refresh tokens
+
+                var roles = await _context.UsersRoles.Where(x => x.UserId == user.UserId).ToListAsync();
+
+                var userRolesList = new List<int>();
+
+                foreach (var role in roles)
+                {
+                    userRolesList.Add(role.RoleId);
+                }
+
+                var authResult = new AuthResultDTO();
+
+                authResult.AccessToken = _token.GenerateAccessToken(user, userRolesList);
+                authResult.RefreshToken = _token.GenerateRefreshToken(user.UserId, ipAddress, deviceInfo, session.UserSessionId).ToString();
+
+                await _context.SaveChangesAsync();
+                return response.SuccessResponse(authResult, $"User {user.UserName} logged in successfully");
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogServiceErrorAsync(
+                  "0000",
+                  ex.Message,
+                  "Service",
+                  "VerifyEmail",
+                  null
+                  );
+                return response.FailResponse(ex.Message);
+            }
         }
 
         public Task<ServiceResponse<bool>> LogoutAsync(int userId)
@@ -57,8 +192,8 @@ namespace EduPortal.Services
             if (await _context.Users.FirstOrDefaultAsync(x => x.Email == model.Email && x.IsVerified == true) is not null)
             {
                 await _logger.LogServiceErrorAsync(
-                    "1000",
-                    "User with this email already exists",
+                    "1012",
+                    "User already registered",
                     "Service",
                     "RegisterAsync",
                     null
@@ -101,18 +236,20 @@ namespace EduPortal.Services
                 }
             }
 
-            var id = user?.UserId ?? newUser.UserId;
+            var code = new Random().Next(10000, 99999);
 
-            var emailVerificator = new EmailVerification 
+            var emailVerificator = new EmailVerification
             {
-                
+                UserId = user?.UserId ?? newUser.UserId,
+                Email = model.Email,
+                Code = code
             };
 
-            if(await _context.UsersRoles.FirstOrDefaultAsync(x => x.UserId == id) is null)
+            if (await _context.UsersRoles.FirstOrDefaultAsync(x => x.UserId == emailVerificator.UserId) is null)
             {
                 var userRole = new UsersRoles
                 {
-                    UserId = id,
+                    UserId = emailVerificator.UserId,
                     RoleId = 1
                 };
 
@@ -121,12 +258,49 @@ namespace EduPortal.Services
 
             try
             {
+                await _context.EmailVerification.AddAsync(emailVerificator);
                 await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                return response.FailResponse(ex.Message);
+            }
+
+            var subject = "Email verification on EduPortal";
+            var body = $@"<html>
+                          <body style='font-family: Arial, sans-serif; color: #333;'>
+                            <h2>Verification Code <span style='color:#0078D4;'> -  EduPortal</span>!</h2>
+                            <h4>{code}</h4>
+                            <p>The code is valid untill {emailVerificator.ExpirationDate}</p>
+                            <br />
+                            <hr />
+                            <br />
+                            <p style='font-size:12px; color:#999;'>This is an automated message. Please do not reply.</p>
+                          </body>
+                        </html>";
+
+            var notification = new Notifications 
+            { 
+                UserId = emailVerificator.UserId,
+                NotificationTypeId = 8,
+                Message = body,
+                Created = emailVerificator.Created
+            };            
+
+            try
+            {
+                await _context.Notifications.AddAsync(notification);
+                await _context.SaveChangesAsync();
+                await _emailService.SendEmailAsync(model.Email, subject, body);
             }
             catch(Exception ex)
             {
                 return response.FailResponse(ex.Message);
             }
+
+            notification.IsSent = true;
+            _context.Update(notification);
+            await _context.SaveChangesAsync();
 
             return response.SuccessResponse(model.Email, $"Code sent to the email {model.Email}");
         }
@@ -141,70 +315,102 @@ namespace EduPortal.Services
                     "1000",
                     "Parameter for RegisterAsync can not be null",
                     "Service",
-                    "RegisterAsync",
+                    "VerifyEmail",
                     null
                     );
                 return response.FailResponse("Parameter for VerifyEmail can not be null");
             }
 
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == model.Email && x.IsVerified == false);
-            var newUser = new Users();
+            var emailVerificator = await _context.EmailVerification.OrderByDescending(x => x.Created).FirstOrDefaultAsync(x => x.Email == email);
 
-            if (user is not null)
+            if(emailVerificator is null || emailVerificator.IsUsed)
             {
-                user.FirstName = model.FirstName;
-                user.LastName = model.LastName;
-                user.UserName = model.Email.Split('@')[0];
-                user.PasswordHash = _hasher.HashPassword(user, model.Password);
-                user.StatusId = 5;
-            }
-            else
-            {
-                newUser = new Users
-                {
-                    FirstName = model.FirstName,
-                    LastName = model.LastName,
-                    Email = model.Email,
-                    UserName = model.Email.Split('@')[0],
-                    StatusId = 5
-                };
-
-                newUser.PasswordHash = _hasher.HashPassword(newUser, model.Password);
-
-                await _context.Users.AddAsync(newUser);
-                try
-                {
-                    await _context.SaveChangesAsync();
-                }
-                catch (Exception ex)
-                {
-                    return response.FailResponse(ex.Message);
-                }
+                await _logger.LogServiceErrorAsync(
+                   "0000",
+                   "Can not find email verificator or it is already used",
+                   "Service",
+                   "VerifyEmail",
+                   null
+                   );
+                return response.FailResponse("Can not find email verificator or it is already used");
             }
 
-            var id = user?.UserId ?? newUser.UserId;
-
-            if (await _context.UsersRoles.FirstOrDefaultAsync(x => x.UserId == id) is null)
+            if(emailVerificator.Code != code)
             {
-                var userRole = new UsersRoles
-                {
-                    UserId = id,
-                    RoleId = 1
-                };
-
-                await _context.UsersRoles.AddAsync(userRole);
+                return response.FailResponse("Inputed pin code is not correct");
             }
+            else if(emailVerificator.Code == code && emailVerificator.ExpirationDate < DateTime.Now)
+            {
+                return response.FailResponse("Inputed pin code is expired");
+            }
+
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.UserId == emailVerificator.UserId);
+            
+            if(user is null)
+            {
+                await _logger.LogServiceErrorAsync(
+                  "1001",
+                  $"User with this id can not be found - {emailVerificator.UserId}",
+                  "Service",
+                  "VerifyEmail",
+                  null
+                  );
+                return response.FailResponse("Internal error. Check error logs - service: VerifyEmail");
+            }
+
+            user.IsVerified = true;
+            user.StatusId = 1;
+            emailVerificator.IsUsed = true;
 
             try
             {
+                // Register the session
+
+                var ipAddress = _httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress?.ToString();
+                var deviceInfo = _httpContextAccessor.HttpContext?.Request?.Headers["User-Agent"].ToString();
+
+                var session = new UsersSessions
+                {
+                    UserId = user.UserId,
+                    DateStart = DateTime.Now,
+                    IpAdress = ipAddress,
+                    RestrictionLevelId = 1, 
+                    DeviceInfo = deviceInfo
+                };
+
+                await _context.UsersSessions.AddAsync(session);
                 await _context.SaveChangesAsync();
+
+                // Create Access and Refresh tokens
+
+                var roles = await _context.UsersRoles.Where(x => x.UserId == user.UserId).ToListAsync();
+
+                var userRolesList = new List<int>();
+
+                foreach (var role in roles)
+                {
+                    userRolesList.Add(role.RoleId);
+                }
+
+                var authResult = new AuthResultDTO();
+
+                authResult.AccessToken = _token.GenerateAccessToken(user, userRolesList);
+                authResult.RefreshToken = _token.GenerateRefreshToken(user.UserId, ipAddress, deviceInfo, session.UserSessionId).ToString();
+
+                await _context.SaveChangesAsync();
+                return response.SuccessResponse(authResult, $"Email {emailVerificator.Email} verified successfully.");
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
+                await _logger.LogServiceErrorAsync(
+                  "0000",
+                  ex.Message,
+                  "Service",
+                  "VerifyEmail",
+                  null
+                  );
                 return response.FailResponse(ex.Message);
             }
-
-            return response.SuccessResponse(model.Email, $"Code sent to the email {model.Email}");
         }
     }
 }

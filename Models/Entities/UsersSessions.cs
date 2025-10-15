@@ -14,9 +14,11 @@ namespace EduPortal.Models.Entities
 
         public DateTime? DateEnd { get; set; }
 
-        public DateTime ValidTill { get; set; } //= DateTime.Now.AddMinutes(15);
+        public DateTime? ValidTill { get; set; } //= DateTime.Now.AddMinutes(15);
 
-        public string IpAdress { get; set; }
+        public string? IpAdress { get; set; }
+
+        public string? DeviceInfo { get; set; }
 
         public int RestrictionLevelId { get; set; }
 

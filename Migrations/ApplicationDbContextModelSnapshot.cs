@@ -776,6 +776,13 @@ namespace EduPortal.Migrations
                             DescrEng = "Assignment due reminder",
                             DescrLocal = "დავალების ვადა ახლოვდება",
                             IsActive = true
+                        },
+                        new
+                        {
+                            NotificationTypeId = 8,
+                            DescrEng = "Verification pin code",
+                            DescrLocal = "ვერიფიკაციის პინ კოდი",
+                            IsActive = true
                         });
                 });
 
@@ -1141,6 +1148,9 @@ namespace EduPortal.Migrations
                     b.Property<DateTime?>("LockedUntill")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("LoginFailCounter")
+                        .HasColumnType("int");
+
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -1202,8 +1212,10 @@ namespace EduPortal.Migrations
                     b.Property<DateTime>("DateStart")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("DeviceInfo")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("IpAdress")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("RestrictionLevelId")
@@ -1212,7 +1224,7 @@ namespace EduPortal.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("ValidTill")
+                    b.Property<DateTime?>("ValidTill")
                         .HasColumnType("datetime2");
 
                     b.HasKey("UserSessionId");
