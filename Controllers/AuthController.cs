@@ -72,12 +72,6 @@ namespace EduPortal.Controllers
             return Ok(response);
         }
 
-        [HttpPost("ResendCode")]
-        public async Task<IActionResult> ResendCode(string email)
-        {
-            return Ok();
-        }
-
         [HttpPost("Login")]
         public async Task<IActionResult> Login(UserLoginDTO dto)
         {

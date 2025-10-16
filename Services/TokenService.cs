@@ -59,7 +59,7 @@ namespace EduPortal.Services
             return Convert.ToBase64String(randomBytes);
         }
 
-        public UserTokens GenerateRefreshToken(int userId, string ipAdress, string deviceInfo, int? sessionId = null, int jwtId = 0)
+        public string GenerateRefreshToken(int userId, int? sessionId = null, string? jwtId = null)
         {
             var config = _config.GetSection("JwtSettings");
 
@@ -67,18 +67,16 @@ namespace EduPortal.Services
             {
                 UserId = userId,
                 RefreshToken = GenerateRandomSecureToken(),
-                IpAdress = ipAdress,
                 JwtId = jwtId,
                 CreatedAt = DateTime.Now,
                 ExpiresAt = DateTime.Now.AddDays(double.Parse(config["RefreshTokenExpiresDays"]!)),
-                DeviceInfo = deviceInfo, 
                 SessionId = sessionId
             };
 
             _context.UserTokens.Add(userToken);
             _context.SaveChanges();
 
-            return userToken;
+            return userToken.RefreshToken;
         }
     }
 }

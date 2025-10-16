@@ -90,9 +90,20 @@ namespace EduPortal.Services
                                   </body>
                                 </html>";
 
+                    var notification = new Notifications
+                    {
+                        UserId = user.UserId,
+                        NotificationTypeId = 9,
+                        Message = body,
+                        Created = DateTime.Now,
+                        IsSent = false
+                    };
+
                     try
                     {
-                        await _emailService.SendEmailAsync(user.Email, subject, body);
+                        await _context.Notifications.AddAsync(notification);
+                        await _context.SaveChangesAsync();
+                        await _emailService.SendEmailAsync(user.Email, subject, body);                        
                     }
                     catch(Exception ex)
                     {
@@ -106,10 +117,13 @@ namespace EduPortal.Services
 
                         return response.FailResponse(ex.Message);
                     }
+
+                    notification.IsSent = true;
+                    await _context.SaveChangesAsync();
                 }
 
-                await _context.SaveChangesAsync();
-                return response.FailResponse("Incorrect Password");
+                await _context.SaveChangesAsync(); 
+                return response.FailResponse(user.LoginFailCounter == 5 ? $"Your account got locked untill {user.LockedUntill}" : "Incorrect Password");
             }
 
             try
@@ -145,7 +159,11 @@ namespace EduPortal.Services
                 var authResult = new AuthResultDTO();
 
                 authResult.AccessToken = _token.GenerateAccessToken(user, userRolesList);
-                authResult.RefreshToken = _token.GenerateRefreshToken(user.UserId, ipAddress, deviceInfo, session.UserSessionId).ToString();
+
+                var handler = new JwtSecurityTokenHandler();
+                var jwtToken = handler.ReadJwtToken(authResult.AccessToken);
+
+                authResult.RefreshToken = _token.GenerateRefreshToken(user.UserId, session.UserSessionId, jwtToken.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Jti)?.Value);
 
                 await _context.SaveChangesAsync();
                 return response.SuccessResponse(authResult, $"User {user.UserName} logged in successfully");
@@ -395,7 +413,11 @@ namespace EduPortal.Services
                 var authResult = new AuthResultDTO();
 
                 authResult.AccessToken = _token.GenerateAccessToken(user, userRolesList);
-                authResult.RefreshToken = _token.GenerateRefreshToken(user.UserId, ipAddress, deviceInfo, session.UserSessionId).ToString();
+
+                var handler = new JwtSecurityTokenHandler();
+                var jwtToken = handler.ReadJwtToken(authResult.AccessToken);
+
+                authResult.RefreshToken = _token.GenerateRefreshToken(user.UserId, session.UserSessionId, jwtToken.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Jti)?.Value);
 
                 await _context.SaveChangesAsync();
                 return response.SuccessResponse(authResult, $"Email {emailVerificator.Email} verified successfully.");
