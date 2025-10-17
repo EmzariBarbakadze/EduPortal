@@ -192,6 +192,7 @@ namespace EduPortal.Migrations
                     StatusId = table.Column<int>(type: "int", nullable: false),
                     BirthDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LastLoginAttempt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     LoginFailCounter = table.Column<int>(type: "int", nullable: false),
                     IsLocked = table.Column<bool>(type: "bit", nullable: false),
                     LockedUntill = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -524,12 +525,10 @@ namespace EduPortal.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<int>(type: "int", nullable: false),
                     RefreshToken = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    JwtId = table.Column<int>(type: "int", nullable: false),
+                    JwtId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ExpiresAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     RevokedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IpAdress = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DeviceInfo = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SessionId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -696,7 +695,8 @@ namespace EduPortal.Migrations
                     { 5, "Grade published", "შეფასება გამოქვეყნდა", true },
                     { 6, "New message received", "ახალი შეტყობინება მიღებულია", true },
                     { 7, "Assignment due reminder", "დავალების ვადა ახლოვდება", true },
-                    { 8, "Verification pin code", "ვერიფიკაციის პინ კოდი", true }
+                    { 8, "Verification pin code", "ვერიფიკაციის პინ კოდი", true },
+                    { 9, "Your account is locked", "თქვენი ანგარიში დაილოქა", true }
                 });
 
             migrationBuilder.InsertData(

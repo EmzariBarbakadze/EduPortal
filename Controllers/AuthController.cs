@@ -97,12 +97,28 @@ namespace EduPortal.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpPost("Logout")]
         public async Task<IActionResult> Logout()
         {
-            return Ok();
+            var response = await _authService.LogoutAsync();
+
+            if (!response.Success)
+            {
+                await _logger.LogServiceErrorAsync(
+                  "0000",
+                  "Error from logout service",
+                  "Controller",
+                  "Logout",
+                  null
+                );
+                return BadRequest(response.Message);
+            }
+
+            return Ok(response);
         }
 
+        [Authorize]
         [HttpPost("Refresh")]
         public async Task<IActionResult> Refresh()
         {

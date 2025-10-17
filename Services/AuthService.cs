@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.WebSockets;
+using System.Security.Claims;
 
 namespace EduPortal.Services
 {
@@ -68,7 +69,8 @@ namespace EduPortal.Services
                 await _context.SaveChangesAsync();
             }
 
-            if(user.PasswordHash != _hasher.HashPassword(user, model.Password))
+            var verifyResult = _hasher.VerifyHashedPassword(user, user.PasswordHash, model.Password);
+            if (verifyResult == PasswordVerificationResult.Failed)
             {
                 user.LoginFailCounter++;
 
@@ -142,6 +144,8 @@ namespace EduPortal.Services
                     DeviceInfo = deviceInfo
                 };
 
+                user.LoginFailCounter = 0;
+
                 await _context.UsersSessions.AddAsync(session);
                 await _context.SaveChangesAsync();
 
@@ -181,9 +185,40 @@ namespace EduPortal.Services
             }
         }
 
-        public Task<ServiceResponse<bool>> LogoutAsync(int userId)
+        public async Task<ServiceResponse<bool>> LogoutAsync()
         {
-            throw new NotImplementedException();
+            var response = new ServiceResponse<bool>();
+            var httpContext = _httpContextAccessor.HttpContext;
+
+            var userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var jwtId = httpContext.User.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
+
+            if (userId is null || jwtId is null)
+                return response.FailResponse("Invalid jwt token. Can not logout!");
+
+            var storedToken = await _context.UserTokens.FirstOrDefaultAsync(x => x.JwtId == jwtId);
+            if (storedToken is null)
+                return response.FailResponse("Can not find userToken with given jwt id");
+
+            var userSession = await _context.UsersSessions.FirstOrDefaultAsync(x => x.UserSessionId == storedToken.SessionId);
+            if (userSession is null)
+                return response.FailResponse("Can not find user session with given session id");
+            else if (userSession.DateEnd is not null || userSession.DateEnd < DateTime.Now)
+                return response.FailResponse("Session is already finished or something went wrong. check logout service");
+
+            try
+            {
+                storedToken.RevokedAt = DateTime.Now;
+                userSession.DateEnd = DateTime.Now;
+
+                await _context.SaveChangesAsync();
+
+                return response.SuccessResponse(true, "User logged out successfully");
+            }
+            catch(Exception ex)
+            {
+                return response.FailResponse($"Unknown error in logout service: {ex.Message}");
+            }
         }
 
         public Task<ServiceResponse<AuthResultDTO>> RefreshTokenAsync(string refreshToken)

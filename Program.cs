@@ -10,6 +10,8 @@ using EduPortal.Middlewares;
 using EduPortal.Models.HelperClasses;
 using Microsoft.AspNetCore.Identity;
 using EduPortal.Models.Entities;
+using Microsoft.OpenApi.Models;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace EduPortal
 {
@@ -21,7 +23,35 @@ namespace EduPortal
 
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "EduPortal API", Version = "v1" });
+
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Description = "Please enter JWT token with **Bearer** prefix. Example: `Bearer eyJhbGciOi...`",
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer"
+                });
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        Array.Empty<string>()
+                    }
+                });
+            });
+
 
             builder.Services.AddHttpContextAccessor();
 

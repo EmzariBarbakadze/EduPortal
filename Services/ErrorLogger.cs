@@ -34,7 +34,7 @@ namespace EduPortal.Services
         {
             var log = new ExceptionLogs
             {
-                Code = "1",
+                Code = code,
                 Message = message,
                 Details = details,
                 Layer = layer ?? "Service",

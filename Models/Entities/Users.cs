@@ -28,6 +28,8 @@ namespace EduPortal.Models.Entities
 
         public DateTime Created { get; set; } = DateTime.Now;
 
+        public DateTime? LastLoginAttempt { get; set; }
+
         public int LoginFailCounter { get; set; } = 0;
 
         public bool IsLocked { get; set; } = false;

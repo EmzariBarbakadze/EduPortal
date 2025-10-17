@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EduPortal.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251015141021_InitialMigration")]
+    [Migration("20251017112051_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -786,6 +786,13 @@ namespace EduPortal.Migrations
                             DescrEng = "Verification pin code",
                             DescrLocal = "ვერიფიკაციის პინ კოდი",
                             IsActive = true
+                        },
+                        new
+                        {
+                            NotificationTypeId = 9,
+                            DescrEng = "Your account is locked",
+                            DescrLocal = "თქვენი ანგარიში დაილოქა",
+                            IsActive = true
                         });
                 });
 
@@ -1082,17 +1089,12 @@ namespace EduPortal.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("DeviceInfo")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("ExpiresAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("IpAdress")
+                    b.Property<string>("JwtId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("JwtId")
-                        .HasColumnType("int");
 
                     b.Property<string>("RefreshToken")
                         .IsRequired()
@@ -1143,6 +1145,9 @@ namespace EduPortal.Migrations
 
                     b.Property<bool>("IsVerified")
                         .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastLoginAttempt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("LastName")
                         .IsRequired()

@@ -1086,14 +1086,8 @@ namespace EduPortal.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("DeviceInfo")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("ExpiresAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("IpAdress")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("JwtId")
                         .IsRequired()
@@ -1148,6 +1142,9 @@ namespace EduPortal.Migrations
 
                     b.Property<bool>("IsVerified")
                         .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastLoginAttempt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("LastName")
                         .IsRequired()
