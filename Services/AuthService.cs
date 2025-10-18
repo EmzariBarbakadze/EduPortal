@@ -55,6 +55,15 @@ namespace EduPortal.Services
                 return response.FailResponse("User with given username can not be found");
             }
 
+            if(user.LastLoginAttempt?.AddHours(5) <= DateTime.Now)
+            {
+                user.LoginFailCounter = 0;
+                user.IsLocked = false;
+                user.LockedUntill = null;
+
+                await _context.SaveChangesAsync();
+            }
+
             if(user.IsLocked && user.LockedUntill >= DateTime.Now)
             {
                 return response.FailResponse($"The user account is locked untill {user.LockedUntill}");
@@ -69,11 +78,13 @@ namespace EduPortal.Services
                 await _context.SaveChangesAsync();
             }
 
+            user.LastLoginAttempt = DateTime.Now;
+
             var verifyResult = _hasher.VerifyHashedPassword(user, user.PasswordHash, model.Password);
             if (verifyResult == PasswordVerificationResult.Failed)
             {
                 user.LoginFailCounter++;
-
+                
                 if(user.LoginFailCounter >= 5)
                 {
                     user.IsLocked = true;
@@ -180,7 +191,7 @@ namespace EduPortal.Services
                   "Service",
                   "VerifyEmail",
                   null
-                  );
+                );
                 return response.FailResponse(ex.Message);
             }
         }
@@ -365,12 +376,12 @@ namespace EduPortal.Services
             if (email is null)
             {
                 await _logger.LogServiceErrorAsync(
-                    "1000",
-                    "Parameter for RegisterAsync can not be null",
-                    "Service",
-                    "VerifyEmail",
-                    null
-                    );
+                        "1000",
+                        "Parameter for RegisterAsync can not be null",
+                        "Service",
+                        "VerifyEmail",
+                        null
+                );
                 return response.FailResponse("Parameter for VerifyEmail can not be null");
             }
 
@@ -379,12 +390,12 @@ namespace EduPortal.Services
             if(emailVerificator is null || emailVerificator.IsUsed)
             {
                 await _logger.LogServiceErrorAsync(
-                   "0000",
-                   "Can not find email verificator or it is already used",
-                   "Service",
-                   "VerifyEmail",
-                   null
-                   );
+                       "0000",
+                       "Can not find email verificator or it is already used",
+                       "Service",
+                       "VerifyEmail",
+                       null
+                );
                 return response.FailResponse("Can not find email verificator or it is already used");
             }
 
@@ -402,12 +413,12 @@ namespace EduPortal.Services
             if(user is null)
             {
                 await _logger.LogServiceErrorAsync(
-                  "1001",
-                  $"User with this id can not be found - {emailVerificator.UserId}",
-                  "Service",
-                  "VerifyEmail",
-                  null
-                  );
+                      "1001",
+                      $"User with this id can not be found - {emailVerificator.UserId}",
+                      "Service",
+                      "VerifyEmail",
+                      null
+                );
                 return response.FailResponse("Internal error. Check error logs - service: VerifyEmail");
             }
 
@@ -460,12 +471,12 @@ namespace EduPortal.Services
             catch(Exception ex)
             {
                 await _logger.LogServiceErrorAsync(
-                  "0000",
-                  ex.Message,
-                  "Service",
-                  "VerifyEmail",
-                  null
-                  );
+                      "0000",
+                      ex.Message,
+                      "Service",
+                      "VerifyEmail",
+                      null
+                );
                 return response.FailResponse(ex.Message);
             }
         }
