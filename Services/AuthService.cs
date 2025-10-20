@@ -6,9 +6,12 @@ using EduPortal.Models.Entities;
 using EduPortal.Models.HelperClasses;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Primitives;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.WebSockets;
 using System.Security.Claims;
+using System.Text;
 
 namespace EduPortal.Services
 {
@@ -20,8 +23,15 @@ namespace EduPortal.Services
         private readonly IPasswordHasher<Users> _hasher;
         private readonly IEmailService _emailService;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IConfiguration _config;
 
-        public AuthService(ApplicationDbContext context, ITokenService token, IErrorLogger logger, IPasswordHasher<Users> hasher, IEmailService emailService, IHttpContextAccessor httpContextAccessor)
+        public AuthService(ApplicationDbContext context
+            , ITokenService token
+            , IErrorLogger logger
+            , IPasswordHasher<Users> hasher
+            , IEmailService emailService
+            , IHttpContextAccessor httpContextAccessor
+            , IConfiguration config)
         {
             _context = context;
             _token = token;
@@ -29,6 +39,7 @@ namespace EduPortal.Services
             _hasher = hasher;
             _emailService = emailService;
             _httpContextAccessor = httpContextAccessor;
+            _config = config;
         }
 
         public async Task<ServiceResponse<AuthResultDTO>> LoginAsync(UserLoginDTO model)
@@ -164,14 +175,14 @@ namespace EduPortal.Services
 
                 var roles = await _context.UsersRoles.Where(x => x.UserId == user.UserId).ToListAsync();
 
-                var userRolesList = new List<int>();
+                var userRolesList = new List<string>();
+
+                var authResult = new AuthResultDTO();
 
                 foreach (var role in roles)
                 {
-                    userRolesList.Add(role.RoleId);
+                    userRolesList.Add(_context.Roles.FirstOrDefault(x => x.RoleId == role.RoleId).DescrEng);
                 }
-
-                var authResult = new AuthResultDTO();
 
                 authResult.AccessToken = _token.GenerateAccessToken(user, userRolesList);
 
@@ -232,9 +243,95 @@ namespace EduPortal.Services
             }
         }
 
-        public Task<ServiceResponse<AuthResultDTO>> RefreshTokenAsync(string refreshToken)
+        public async Task<ServiceResponse<AuthResultDTO>> RefreshTokenAsync(TokenRequestDTO model)
         {
-            throw new NotImplementedException();
+            var response = new ServiceResponse<AuthResultDTO>();
+
+            if(model is null || model.AccessToken.IsNullOrEmpty() || model.RefreshToken.IsNullOrEmpty())
+            {
+                await _logger.LogServiceErrorAsync(
+                    "1000",
+                    "Invalid parameter for RefreshTokenAsync service",
+                    "Service",
+                    "RefreshTokenAsync",
+                    null
+                );
+
+                return response.FailResponse("Invalid parameter for RefreshTokenAsync service");
+            }
+
+            var jwtSettings = _config.GetSection("JwtSettings");
+            var principal = GetPrincipalFromTokenAsync(model.AccessToken, jwtSettings["Key"]!, false);
+
+            if (principal is null || principal.Identity is null || !principal.Identity.IsAuthenticated)
+            {
+                await _logger.LogServiceErrorAsync(
+                    "0000",
+                    "Something went wrong in GetPrincipalFromTokenAsync, Invalid token is given",
+                    "Service",
+                    "RefreshTokenAsync",
+                    null
+                );
+
+                return response.FailResponse("Something went wrong in GetPrincipalFromTokenAsync, Invalid token is given");
+            }
+
+            var userId = int.Parse(principal.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Sub)?.Value!);
+            if (userId == 0)
+            {
+                return response.FailResponse("Can not get user id from given access token");
+            }
+
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.UserId == userId);
+            if (user is null)
+            {
+                return response.FailResponse("User with given user id not found");
+            }
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var jwt = tokenHandler.ReadJwtToken(model.AccessToken);
+            var jwtId = jwt.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Jti)?.Value;
+
+            if (string.IsNullOrEmpty(jwtId))
+            {
+                return response.FailResponse("Invalid access token. Missing JTI");
+            }
+
+            var userRefreshToken = await _context.UserTokens.Where(x => x.JwtId == jwtId).OrderByDescending(x => x.CreatedAt).FirstOrDefaultAsync();
+
+            if(userRefreshToken.RefreshToken != model.RefreshToken)
+            {
+                return response.FailResponse("Given refresh token do not match user's refresh token");
+            }
+
+            var userRoles = await _context.UsersRoles.Where(x => x.UserId == user.UserId).ToListAsync();
+            var roles = new List<string>();
+
+            foreach( var role in userRoles)
+            {
+                roles.Add(_context.Roles.FirstOrDefault(x => x.RoleId == role.RoleId)!.DescrEng);
+            }
+
+            try
+            {
+                var accessToken = _token.GenerateAccessToken(user, roles);
+                var refreshToken = _token.GenerateRandomSecureToken();
+                var newAccessToken = tokenHandler.ReadJwtToken(accessToken);
+
+                userRefreshToken.RefreshToken = refreshToken;
+                userRefreshToken.JwtId = newAccessToken.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Jti)!.ToString();
+                userRefreshToken.CreatedAt = DateTime.Now;
+                userRefreshToken.ExpiresAt = DateTime.Now.AddDays(1);
+                userRefreshToken.RevokedAt = null;
+
+                await _context.SaveChangesAsync();
+
+                return response.SuccessResponse(new AuthResultDTO { AccessToken = accessToken, RefreshToken = refreshToken }, "Token refreshed successfully");
+            }
+            catch(Exception ex)
+            {
+                return response.FailResponse(ex.Message);
+            }
         }
 
         public async Task<ServiceResponse<string>> RegisterAsync(UserRegisterDTO model)
@@ -449,11 +546,11 @@ namespace EduPortal.Services
 
                 var roles = await _context.UsersRoles.Where(x => x.UserId == user.UserId).ToListAsync();
 
-                var userRolesList = new List<int>();
+                var userRolesList = new List<string>();
 
                 foreach (var role in roles)
                 {
-                    userRolesList.Add(role.RoleId);
+                    userRolesList.Add(_context.Roles.FirstOrDefault(x => x.RoleId == role.RoleId).DescrEng);
                 }
 
                 var authResult = new AuthResultDTO();
@@ -478,6 +575,40 @@ namespace EduPortal.Services
                       null
                 );
                 return response.FailResponse(ex.Message);
+            }
+        }
+
+        private ClaimsPrincipal? GetPrincipalFromTokenAsync(string token, string secret, bool validateLifetime)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.UTF8.GetBytes(secret);
+
+            var validationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ValidateLifetime = validateLifetime,
+                ClockSkew = TimeSpan.Zero
+            };
+
+            try
+            {
+                var principal = tokenHandler.ValidateToken(token, validationParameters, out var validatedToken);
+                if (validatedToken is JwtSecurityToken jwtToken &&
+                   jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return principal;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch
+            {
+                return null;
             }
         }
     }

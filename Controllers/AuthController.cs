@@ -97,6 +97,46 @@ namespace EduPortal.Controllers
             return Ok(response);
         }
 
+        [HttpPost("Refresh")]
+        public async Task<IActionResult> Refresh(TokenRequestDTO dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                await _logger.LogServiceErrorAsync(
+                    "1000",
+                    "Modelstate is not valid in Refresh controller",
+                    "Controller",
+                    "Refresh",
+                    null
+                );
+                return BadRequest(ModelState);
+            }
+
+            var response = await _authService.RefreshTokenAsync(dto);
+
+            if (!response.Success)
+            {
+                return BadRequest(response.Message);
+            }
+
+            return Ok();
+        }
+
+        [HttpPost("ForgotPassword")]  // It needs parameter!!! Define the flow first 
+        public async Task<IActionResult> ForgotPassword()
+        {
+            return Ok();
+        }
+
+        [HttpPost("ResetPassword")]  // It needs parameter!!! Define the flow first 
+        public async Task<IActionResult> ResetPassword()
+        {
+            return Ok();
+        }
+
+
+
+        // Authorized endpoints 
         [Authorize]
         [HttpPost("Logout")]
         public async Task<IActionResult> Logout()
@@ -119,8 +159,15 @@ namespace EduPortal.Controllers
         }
 
         [Authorize]
-        [HttpPost("Refresh")]
-        public async Task<IActionResult> Refresh()
+        [HttpGet("Me")]  // Needs parameters define the flow first
+        public async Task<IActionResult> Me()
+        {
+            return Ok();
+        }
+
+        [Authorize]
+        [HttpPost("ChangePassword")]  // This also needs parameters. define flow first 
+        public async Task<IActionResult> ChangePassword()
         {
             return Ok();
         }

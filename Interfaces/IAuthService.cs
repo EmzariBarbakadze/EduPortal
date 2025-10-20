@@ -1,6 +1,8 @@
 ﻿using EduPortal.Models.HelperClasses;
 using EduPortal.Models.DTOs;
 using EduPortal.Models.Entities;
+using System.Security.Claims;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 
 namespace EduPortal.Interfaces
 {
@@ -10,10 +12,11 @@ namespace EduPortal.Interfaces
 
         public Task<ServiceResponse<AuthResultDTO>> LoginAsync(UserLoginDTO model);
 
-        public Task<ServiceResponse<AuthResultDTO>> RefreshTokenAsync(string refreshToken);
+        public Task<ServiceResponse<AuthResultDTO>> RefreshTokenAsync(TokenRequestDTO model);
 
         public Task<ServiceResponse<bool>> LogoutAsync();
 
         public Task<ServiceResponse<AuthResultDTO>> VerifyEmail(string email, int code);
+
     }
 }

@@ -19,7 +19,7 @@ namespace EduPortal.Services
             _context = context;
         }
 
-        public string GenerateAccessToken(Users user, List<int> roles)
+        public string GenerateAccessToken(Users user, List<string> roles)
         {
             var jwtSettings = _config.GetSection("JwtSettings");
             var expireMinutes = double.Parse(jwtSettings["AccessTokenExpiresMinutes"]!);
