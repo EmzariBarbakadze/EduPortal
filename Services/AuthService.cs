@@ -276,7 +276,23 @@ namespace EduPortal.Services
                 return response.FailResponse("Something went wrong in GetPrincipalFromTokenAsync, Invalid token is given");
             }
 
-            var userId = int.Parse(principal.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Sub)?.Value!);
+            var userIdClaim = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                await _logger.LogServiceErrorAsync(
+                    "0000",
+                    "Token does not contain User id",
+                    "Service",
+                    "RefreshTokenAsync",
+                    null
+                );
+
+                return response.FailResponse("Token does not contain User id");
+            }
+
+            var userId = int.Parse(userIdClaim);
+
             if (userId == 0)
             {
                 return response.FailResponse("Can not get user id from given access token");

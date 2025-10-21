@@ -3,9 +3,11 @@ using EduPortal.Models.DTOs;
 using EduPortal.Models.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace EduPortal.Controllers
 {
@@ -119,16 +121,16 @@ namespace EduPortal.Controllers
                 return BadRequest(response.Message);
             }
 
-            return Ok();
+            return Ok(response);
         }
 
-        [HttpPost("ForgotPassword")]  // It needs parameter!!! Define the flow first 
+        [HttpPost("ForgotPassword")]  // It needs parameter!!! Define the flow first
         public async Task<IActionResult> ForgotPassword()
         {
             return Ok();
         }
 
-        [HttpPost("ResetPassword")]  // It needs parameter!!! Define the flow first 
+        [HttpPost("ResetPassword")]  // It needs parameter!!! Define the flow first
         public async Task<IActionResult> ResetPassword()
         {
             return Ok();
