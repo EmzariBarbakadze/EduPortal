@@ -1,6 +1,7 @@
 ﻿using EduPortal.Interfaces;
 using EduPortal.Models.DTOs;
 using EduPortal.Models.Entities;
+using EduPortal.Models.HelperClasses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -124,10 +125,29 @@ namespace EduPortal.Controllers
             return Ok(response);
         }
 
-        [HttpPost("ForgotPassword")]  // It needs parameter!!! Define the flow first
-        public async Task<IActionResult> ForgotPassword()
+        [HttpPost("ForgotPassword")]
+        public async Task<IActionResult> ForgotPassword(string email)
         {
-            return Ok();
+            if (string.IsNullOrEmpty(email) || !ModelState.IsValid)
+            {
+                await _logger.LogServiceErrorAsync(
+                   "1000",
+                   "Invalid parameter for ForgotPassword controller",
+                   "Controller",
+                   "ForgotPassword",
+                   null
+                );
+                return BadRequest(ModelState);
+            }
+
+            var response = await _authService.ForgotPasswordAsync(email);
+
+            if (!response.Success)
+            {
+                return BadRequest(response.Message);
+            }
+
+            return Ok(response);
         }
 
         [HttpPost("ResetPassword")]  // It needs parameter!!! Define the flow first
@@ -163,13 +183,6 @@ namespace EduPortal.Controllers
         [Authorize]
         [HttpGet("Me")]  // Needs parameters define the flow first
         public async Task<IActionResult> Me()
-        {
-            return Ok();
-        }
-
-        [Authorize]
-        [HttpPost("ChangePassword")]  // This also needs parameters. define flow first 
-        public async Task<IActionResult> ChangePassword()
         {
             return Ok();
         }

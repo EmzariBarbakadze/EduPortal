@@ -594,6 +594,94 @@ namespace EduPortal.Services
             }
         }
 
+        public async Task<ServiceResponse<string>> ForgotPasswordAsync(string email)
+        {
+            var response = new ServiceResponse<string>();
+
+            if (string.IsNullOrEmpty(email))
+            {
+                return response.FailResponse("Invalid parameter for ForgotPasswordAsync method - AuthService");
+            }
+
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == email);
+
+            if(user is null)
+            {
+                return response.FailResponse("Given email not found in database");
+            }
+
+            if(user.StatusId != 1)
+            {
+                return response.FailResponse("Can not change password of the user who is not active");
+            }
+
+            var emailVerificator = new EmailVerification
+            {
+                UserId = user.UserId,
+                Email = user.Email,
+                Code = new Random().Next(10000, 99999), 
+                Created = DateTime.Now, 
+                ExpirationDate = DateTime.Now.AddMinutes(1), 
+                IsUsed = false
+            };
+
+            try
+            {
+                await _context.EmailVerification.AddAsync(emailVerificator);
+                await _context.SaveChangesAsync();               
+            }
+            catch(Exception ex)
+            {
+                return response.FailResponse(ex.Message);
+            }
+
+            var subject = "Password reset Pin code - Don't replay";
+            var body = $@"<html>
+                          <body style='font-family: Arial, sans-serif; color: #333;'>
+                            <h2>Password reset pin code <span style='color:#0078D4;'> -  EduPortal</span>!</h2>
+                            <h4>{emailVerificator.Code}</h4>
+                            <p>The code is valid untill {emailVerificator.ExpirationDate}</p>
+                            <br />
+                            <hr />
+                            <br />
+                            <p style='font-size:12px; color:#999;'>This is an automated message. Please do not reply.</p>
+                          </body>
+                        </html>";
+
+            var notification = new Notifications
+            {
+                UserId = user.UserId,
+                NotificationTypeId = 8,
+                Message = body,
+                Created = DateTime.Now,
+                IsSent = false
+            };
+
+            try
+            {
+                await _context.Notifications.AddAsync(notification);
+                await _context.SaveChangesAsync();
+
+                await _emailService.SendEmailAsync(email, subject, body);
+            }
+            catch(Exception ex)
+            {
+                await _logger.LogServiceErrorAsync(
+                   "0000",
+                   ex.Message,
+                   "Service",
+                   "ForgotPasswordAsync",
+                   null
+                   );
+                return response.FailResponse($"Unknown error in ForgotPasswordAsync (auth service) {ex.Message}");
+            }
+
+            notification.IsSent = true;
+            await _context.SaveChangesAsync();
+
+            return response.SuccessResponse(email, $"Password reset pin code successfully sent on {email}");
+        }
+
         private ClaimsPrincipal? GetPrincipalFromTokenAsync(string token, string secret, bool validateLifetime)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
