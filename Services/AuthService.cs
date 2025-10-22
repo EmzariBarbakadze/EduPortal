@@ -181,7 +181,7 @@ namespace EduPortal.Services
 
                 foreach (var role in roles)
                 {
-                    userRolesList.Add(_context.Roles.FirstOrDefault(x => x.RoleId == role.RoleId).DescrEng);
+                    userRolesList.Add(_context.Roles.FirstOrDefault(x => x.RoleId == role.RoleId)!.DescrEng);
                 }
 
                 authResult.AccessToken = _token.GenerateAccessToken(user, userRolesList);
@@ -212,7 +212,7 @@ namespace EduPortal.Services
             var response = new ServiceResponse<bool>();
             var httpContext = _httpContextAccessor.HttpContext;
 
-            var userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId = httpContext!.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var jwtId = httpContext.User.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
 
             if (userId is null || jwtId is null)
@@ -315,7 +315,7 @@ namespace EduPortal.Services
 
             var userRefreshToken = await _context.UserTokens.Where(x => x.JwtId == jwtId).OrderByDescending(x => x.CreatedAt).FirstOrDefaultAsync();
 
-            if(userRefreshToken.RefreshToken != model.RefreshToken)
+            if(userRefreshToken!.RefreshToken != model.RefreshToken)
             {
                 return response.FailResponse("Given refresh token do not match user's refresh token");
             }
@@ -566,7 +566,7 @@ namespace EduPortal.Services
 
                 foreach (var role in roles)
                 {
-                    userRolesList.Add(_context.Roles.FirstOrDefault(x => x.RoleId == role.RoleId).DescrEng);
+                    userRolesList.Add(_context.Roles.FirstOrDefault(x => x.RoleId == role.RoleId)!.DescrEng);
                 }
 
                 var authResult = new AuthResultDTO();
