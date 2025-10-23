@@ -150,7 +150,7 @@ namespace EduPortal.Controllers
             return Ok(response);
         }
 
-        [HttpPost("ResetPassword")]  // It needs parameter!!! Define the flow first
+        [HttpPost("ResetPassword")]  
         public async Task<IActionResult> ResetPassword(ResetPasswordDTO dto)
         {
             if(!ModelState.IsValid || dto is null)
@@ -165,7 +165,7 @@ namespace EduPortal.Controllers
                 return BadRequest(ModelState);
             }
 
-            var response = new ServiceResponse<bool>();
+            var response = await _authService.ResetPasswordAsync(dto);
 
             if (!response.Success)
             {
@@ -203,7 +203,21 @@ namespace EduPortal.Controllers
         [HttpGet("Me")]  // Needs parameters define the flow first
         public async Task<IActionResult> Me()
         {
-            return Ok();
+            var response = await _authService.MeAsync();
+
+            if (!response.Success)
+            {
+                await _logger.LogServiceErrorAsync(
+                  "0000",
+                  "Error from Me service",
+                  "Controller",
+                  "Me",
+                  null
+                );
+                return BadRequest(response.Message);
+            }
+
+            return Ok(response);
         }
     }
 }

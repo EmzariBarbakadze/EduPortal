@@ -715,7 +715,68 @@ namespace EduPortal.Services
             if (model.Password != model.RepeatPassword)
                 return response.FailResponse("Given passwords do not match each other");
 
+            var passwordHash = _hasher.HashPassword(user, model.Password);
 
+            try
+            {
+                user.PasswordHash = passwordHash;
+                await _context.SaveChangesAsync();
+
+                return response.SuccessResponse(true, "Password changed successfully");
+            }
+            catch(Exception ex)
+            {
+                return response.FailResponse(ex.Message);
+            }
+        }
+
+        public async Task<ServiceResponse<PersonalInfoDTO>> MeAsync()
+        {
+            var response = new ServiceResponse<PersonalInfoDTO>();
+            var httpContext = _httpContextAccessor.HttpContext;
+
+            if(httpContext is null)
+                return response.FailResponse("Http context can not be null in MeAsync service");
+
+            var userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if(userId is null)
+                return response.FailResponse("Can not take user id from http context");
+
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.UserId.ToString() == userId);
+
+            if (user is null)
+                return response.FailResponse("Can not find user with given id in database");
+
+            try
+            {
+                var userInfo = new PersonalInfoDTO
+                {
+                    UserId = user.UserId,
+                    UserName = user.UserName,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Email = user.Email
+                };
+
+                var userRoles = await _context.UsersRoles.Where(x => x.UserId == user.UserId).ToListAsync();
+
+                var roles = new List<string>();
+
+                foreach (var role in userRoles)
+                {
+                    var roleObject = await _context.Roles.FirstOrDefaultAsync(x => x.RoleId == role.RoleId);
+                    roles.Add(roleObject!.DescrEng);
+                }
+
+                userInfo.Roles = roles;
+
+                return response.SuccessResponse(userInfo, "User information found successfully");
+            }
+            catch(Exception ex)
+            {
+                return response.FailResponse(ex.Message);
+            }
         }
 
         private ClaimsPrincipal? GetPrincipalFromTokenAsync(string token, string secret, bool validateLifetime)
