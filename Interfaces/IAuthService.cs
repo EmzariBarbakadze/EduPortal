@@ -19,5 +19,9 @@ namespace EduPortal.Interfaces
         public Task<ServiceResponse<AuthResultDTO>> VerifyEmail(string email, int code);
 
         public Task<ServiceResponse<string>> ForgotPasswordAsync(string email);
+
+        public Task<ServiceResponse<bool>> ResetPasswordAsync(ResetPasswordDTO model);
+
+        public Task<ServiceResponse<PersonalInfoDTO>> MeAsync();
     }
 }
