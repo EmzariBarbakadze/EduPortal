@@ -682,6 +682,42 @@ namespace EduPortal.Services
             return response.SuccessResponse(email, $"Password reset pin code successfully sent on {email}");
         }
 
+        public async Task<ServiceResponse<bool>> ResetPasswordAsync(ResetPasswordDTO model)
+        {
+            var response = new ServiceResponse<bool>();
+
+            if (model is null)
+            {
+                return response.FailResponse("Parameter for ResetPasswordAsync service can not be null or empty");
+            }
+
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == model.Email);
+
+            if (user is null)
+            {
+                return response.FailResponse("User with given email not found - ResetPasswordAsync");
+            }
+
+            var verificator = await _context.EmailVerification.Where(x => x.Email == model.Email).OrderByDescending(x => x.Created).FirstOrDefaultAsync();
+
+            if(verificator is null)
+                return response.FailResponse("Can not find proper email verificator in db - ResetPasswordAsync");
+
+            if (verificator.Code != model.PinCode)
+                return response.FailResponse("Incorrect pin code is given");
+
+            if (verificator.ExpirationDate < DateTime.Now)
+                return response.FailResponse("Pin code is expired");
+
+            if (verificator.IsUsed == true)
+                return response.FailResponse("This pin code is already used so it is not valid anymore");
+
+            if (model.Password != model.RepeatPassword)
+                return response.FailResponse("Given passwords do not match each other");
+
+
+        }
+
         private ClaimsPrincipal? GetPrincipalFromTokenAsync(string token, string secret, bool validateLifetime)
         {
             var tokenHandler = new JwtSecurityTokenHandler();

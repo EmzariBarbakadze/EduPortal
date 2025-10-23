@@ -151,9 +151,28 @@ namespace EduPortal.Controllers
         }
 
         [HttpPost("ResetPassword")]  // It needs parameter!!! Define the flow first
-        public async Task<IActionResult> ResetPassword()
+        public async Task<IActionResult> ResetPassword(ResetPasswordDTO dto)
         {
-            return Ok();
+            if(!ModelState.IsValid || dto is null)
+            {
+                await _logger.LogServiceErrorAsync(
+                   "1000",
+                   "Invalid parameter for ResetPassword controller",
+                   "Controller",
+                   "ResetPassword",
+                   null
+                );
+                return BadRequest(ModelState);
+            }
+
+            var response = new ServiceResponse<bool>();
+
+            if (!response.Success)
+            {
+                return BadRequest(response.Message);
+            }
+
+            return Ok(response);
         }
 
 
