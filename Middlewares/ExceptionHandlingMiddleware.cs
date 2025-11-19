@@ -26,12 +26,18 @@ namespace EduPortal.Middlewares
                 using var scope = _scopeFactory.CreateScope();
                 var errorLogger = scope.ServiceProvider.GetRequiredService<IErrorLogger>();
 
-                var userId = int.Parse(context.User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value);
+                int userId = 0;
+                var subClaim = context.User.FindFirst(JwtRegisteredClaimNames.Sub);
+
+                if (subClaim != null && int.TryParse(subClaim.Value, out var parsedUserId))
+                    userId = parsedUserId;
+
                 await errorLogger.LogExceptionAsync(ex, context.Request.Path, userId);
 
                 context.Response.StatusCode = 500;
                 await context.Response.WriteAsync("Internal Server Error");
             }
         }
+
     }
 }

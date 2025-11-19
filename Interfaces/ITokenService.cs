@@ -6,7 +6,7 @@ namespace EduPortal.Interfaces
     {
         public string GenerateAccessToken(Users user, List<string> roles);
 
-        public string GenerateRefreshToken(int userId, int? sessionId = null, string? jwtId = null);
+        public (string refreshToken, DateTime expires) GenerateRefreshToken(int userId, int? sessionId = null, string? jwtId = null);
 
         public string GenerateRandomSecureToken();
     }

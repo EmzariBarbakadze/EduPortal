@@ -1,15 +1,12 @@
-﻿using Azure;
-using EduPortal.Data;
+﻿using EduPortal.Data;
 using EduPortal.Interfaces;
 using EduPortal.Models.DTOs;
 using EduPortal.Models.Entities;
 using EduPortal.Models.HelperClasses;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Primitives;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using System.Net.WebSockets;
 using System.Security.Claims;
 using System.Text;
 
@@ -189,7 +186,9 @@ namespace EduPortal.Services
                 var handler = new JwtSecurityTokenHandler();
                 var jwtToken = handler.ReadJwtToken(authResult.AccessToken);
 
-                authResult.RefreshToken = _token.GenerateRefreshToken(user.UserId, session.UserSessionId, jwtToken.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Jti)?.Value);
+                var refreshTokenResponse = _token.GenerateRefreshToken(user.UserId, session.UserSessionId, jwtToken.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Jti)?.Value);
+                authResult.RefreshToken = refreshTokenResponse.refreshToken;
+                authResult.RefreshTokenExpireDate = refreshTokenResponse.expires;
 
                 await _context.SaveChangesAsync();
                 return response.SuccessResponse(authResult, $"User {user.UserName} logged in successfully");
@@ -576,7 +575,9 @@ namespace EduPortal.Services
                 var handler = new JwtSecurityTokenHandler();
                 var jwtToken = handler.ReadJwtToken(authResult.AccessToken);
 
-                authResult.RefreshToken = _token.GenerateRefreshToken(user.UserId, session.UserSessionId, jwtToken.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Jti)?.Value);
+                var refreshTokenResponse = _token.GenerateRefreshToken(user.UserId, session.UserSessionId, jwtToken.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Jti)?.Value);
+                authResult.RefreshToken = refreshTokenResponse.refreshToken;
+                authResult.RefreshTokenExpireDate = refreshTokenResponse.expires;
 
                 await _context.SaveChangesAsync();
                 return response.SuccessResponse(authResult, $"Email {emailVerificator.Email} verified successfully.");

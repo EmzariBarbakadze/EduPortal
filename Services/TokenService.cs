@@ -3,8 +3,10 @@ using EduPortal.Interfaces;
 using EduPortal.Models.Entities;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Runtime.Intrinsics.Arm;
 using System.Security.Claims;
 using System.Text;
+using System.Security.Cryptography;
 
 namespace EduPortal.Services
 {
@@ -53,20 +55,29 @@ namespace EduPortal.Services
         public string GenerateRandomSecureToken()
         {
             var randomBytes = new byte[64];
-            using var rng = System.Security.Cryptography.RandomNumberGenerator.Create();
+            using var rng = RandomNumberGenerator.Create();
             rng.GetBytes(randomBytes);
 
             return Convert.ToBase64String(randomBytes);
         }
 
-        public string GenerateRefreshToken(int userId, int? sessionId = null, string? jwtId = null)
+        public string HashRefreshToken(string token)
+        {
+            using var sha = SHA256.Create();
+            var hashed = sha.ComputeHash(Encoding.UTF8.GetBytes(token));
+
+            return Convert.ToBase64String(hashed);
+        }
+
+        public (string, DateTime) GenerateRefreshToken(int userId, int? sessionId = null, string? jwtId = null)
         {
             var config = _config.GetSection("JwtSettings");
+            var refreshToken = GenerateRandomSecureToken();
 
             var userToken = new UserTokens
             {
                 UserId = userId,
-                RefreshToken = GenerateRandomSecureToken(),
+                RefreshToken = HashRefreshToken(refreshToken),
                 JwtId = jwtId,
                 CreatedAt = DateTime.Now,
                 ExpiresAt = DateTime.Now.AddDays(double.Parse(config["RefreshTokenExpiresDays"]!)),
@@ -76,7 +87,7 @@ namespace EduPortal.Services
             _context.UserTokens.Add(userToken);
             _context.SaveChanges();
 
-            return userToken.RefreshToken;
+            return (refreshToken, userToken.ExpiresAt);
         }
     }
 }
