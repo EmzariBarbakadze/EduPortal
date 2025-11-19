@@ -1,14 +1,8 @@
 ﻿using EduPortal.Interfaces;
 using EduPortal.Models.DTOs;
-using EduPortal.Models.Entities;
-using EduPortal.Models.HelperClasses;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
-using System.IO;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+
 
 namespace EduPortal.Controllers
 {
@@ -72,7 +66,19 @@ namespace EduPortal.Controllers
                 return BadRequest(response.Message);
             }
 
-            return Ok(response);
+            Response.Cookies.Append(
+                    "refreshToken",
+                    response.Data!.RefreshToken, 
+                    new CookieOptions
+                    {
+                        HttpOnly = true,
+                        Secure = true,
+                        SameSite = SameSiteMode.Strict,
+                        Expires = response.Data.RefreshTokenExpireDate
+                    }
+                );
+
+            return Ok(response.Data!.AccessToken);
         }
 
         [HttpPost("Login")]
@@ -97,7 +103,19 @@ namespace EduPortal.Controllers
                 return BadRequest(response.Message);
             }
 
-            return Ok(response);
+            Response.Cookies.Append(
+                   "refreshToken",
+                   response.Data!.RefreshToken,
+                   new CookieOptions
+                   {
+                       HttpOnly = true,
+                       Secure = true,
+                       SameSite = SameSiteMode.Strict,
+                       Expires = response.Data.RefreshTokenExpireDate
+                   }
+               );
+
+            return Ok(response.Data!.AccessToken);
         }
 
         [HttpPost("Refresh")]
