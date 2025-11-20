@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EduPortal.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251017112051_InitialMigration")]
+    [Migration("20251120130525_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -1096,12 +1096,16 @@ namespace EduPortal.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("RefreshToken")
+                    b.Property<byte[]>("RefreshToken")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<DateTime?>("RevokedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<byte[]>("Salt")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<int?>("SessionId")
                         .HasColumnType("int");

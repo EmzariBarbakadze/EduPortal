@@ -242,6 +242,7 @@ namespace EduPortal.Services
             }
         }
 
+        // needs to be corrected
         public async Task<ServiceResponse<AuthResultDTO>> RefreshTokenAsync(TokenRequestDTO model)
         {
             var response = new ServiceResponse<AuthResultDTO>();
@@ -314,7 +315,7 @@ namespace EduPortal.Services
 
             var userRefreshToken = await _context.UserTokens.Where(x => x.JwtId == jwtId).OrderByDescending(x => x.CreatedAt).FirstOrDefaultAsync();
 
-            if(userRefreshToken!.RefreshToken != model.RefreshToken)
+            if(userRefreshToken!.RefreshToken.ToString() != model.RefreshToken)
             {
                 return response.FailResponse("Given refresh token do not match user's refresh token");
             }

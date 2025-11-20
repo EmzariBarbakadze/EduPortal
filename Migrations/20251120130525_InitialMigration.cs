@@ -524,7 +524,8 @@ namespace EduPortal.Migrations
                     TokenId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<int>(type: "int", nullable: false),
-                    RefreshToken = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RefreshToken = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
+                    Salt = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
                     JwtId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ExpiresAt = table.Column<DateTime>(type: "datetime2", nullable: false),

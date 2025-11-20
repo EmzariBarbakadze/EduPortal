@@ -12,7 +12,10 @@ namespace EduPortal.Models.Entities
         public int UserId { get; set; }
 
         [NotNull, Required]
-        public string RefreshToken { get; set; }
+        public byte[]? RefreshToken { get; set; }
+
+        [NotNull, Required]
+        public byte[]? Salt { get; set; }
 
         public string JwtId { get; set; } = null;
 

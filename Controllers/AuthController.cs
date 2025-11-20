@@ -68,7 +68,7 @@ namespace EduPortal.Controllers
 
             Response.Cookies.Append(
                     "refreshToken",
-                    response.Data!.RefreshToken, 
+                    response.Data!.RefreshToken.ToString(),
                     new CookieOptions
                     {
                         HttpOnly = true,
@@ -105,7 +105,7 @@ namespace EduPortal.Controllers
 
             Response.Cookies.Append(
                    "refreshToken",
-                   response.Data!.RefreshToken,
+                   response.Data!.RefreshToken.ToString(),
                    new CookieOptions
                    {
                        HttpOnly = true,
