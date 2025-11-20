@@ -350,6 +350,7 @@ namespace EduPortal.Services
             }
         }
 
+
         public async Task<ServiceResponse<string>> RegisterAsync(UserRegisterDTO model)
         {
             var response = new ServiceResponse<string>();

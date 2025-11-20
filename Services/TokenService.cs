@@ -79,7 +79,7 @@ namespace EduPortal.Services
             {
                 UserId = userId,
                 RefreshToken = HashRefreshToken(refreshToken).hash,
-                JwtId = jwtId,
+                JwtId = jwtId!,
                 CreatedAt = DateTime.Now,
                 ExpiresAt = DateTime.Now.AddDays(double.Parse(config["RefreshTokenExpiresDays"]!)),
                 SessionId = sessionId
