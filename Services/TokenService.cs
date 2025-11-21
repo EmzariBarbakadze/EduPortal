@@ -65,7 +65,7 @@ namespace EduPortal.Services
         {
             var salt = RandomNumberGenerator.GetBytes(32);
             using var hmac = new HMACSHA256(salt);
-            var hashed = hmac.ComputeHash(Encoding.UTF8.GetBytes(token.ToString()));
+            var hashed = hmac.ComputeHash(Encoding.UTF8.GetBytes(token.ToString()!));
 
             return (hashed, salt);
         }
@@ -74,12 +74,19 @@ namespace EduPortal.Services
         {
             var config = _config.GetSection("JwtSettings");
             var refreshToken = GenerateRandomSecureToken();
+            var hashedRefreshToken = HashRefreshToken(refreshToken);
 
             var userToken = new UserTokens
             {
                 UserId = userId,
+<<<<<<< HEAD
                 RefreshToken = HashRefreshToken(refreshToken).hash,
                 JwtId = jwtId!,
+=======
+                RefreshToken = hashedRefreshToken.hash,
+                Salt = hashedRefreshToken.salt,
+                JwtId = jwtId,
+>>>>>>> 81136f55bb98b6c96e3dc866f32de7886a9f4753
                 CreatedAt = DateTime.Now,
                 ExpiresAt = DateTime.Now.AddDays(double.Parse(config["RefreshTokenExpiresDays"]!)),
                 SessionId = sessionId

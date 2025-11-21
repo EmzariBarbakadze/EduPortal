@@ -1,4 +1,5 @@
-﻿using EduPortal.Data;
+﻿using Azure;
+using EduPortal.Data;
 using EduPortal.Interfaces;
 using EduPortal.Models.DTOs;
 using EduPortal.Models.Entities;
@@ -6,9 +7,12 @@ using EduPortal.Models.HelperClasses;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EduPortal.Services
 {
@@ -293,7 +297,7 @@ namespace EduPortal.Services
 
             var userId = int.Parse(userIdClaim);
 
-            if (userId == 0)
+            if (userId <= 0)
             {
                 return response.FailResponse("Can not get user id from given access token");
             }
@@ -315,9 +319,23 @@ namespace EduPortal.Services
 
             var userRefreshToken = await _context.UserTokens.Where(x => x.JwtId == jwtId).OrderByDescending(x => x.CreatedAt).FirstOrDefaultAsync();
 
-            if(userRefreshToken!.RefreshToken.ToString() != model.RefreshToken)
+
+            var rawToken = Uri.UnescapeDataString(model.RefreshToken);            
+            var tokenBytes = Encoding.UTF8.GetBytes(rawToken);
+            
+            using var hmac = new HMACSHA256(userRefreshToken!.Salt);
+            var incomingHash = hmac.ComputeHash(tokenBytes);
+
+            bool isValidRefreshToken = CryptographicOperations.FixedTimeEquals(incomingHash, userRefreshToken.RefreshToken);
+
+            if (!isValidRefreshToken)
             {
                 return response.FailResponse("Given refresh token do not match user's refresh token");
+            }
+
+            if(userRefreshToken.ExpiresAt <= DateTime.Now)
+            {
+                return response.FailResponse("Session token is already revoked");
             }
 
             var userRoles = await _context.UsersRoles.Where(x => x.UserId == user.UserId).ToListAsync();
@@ -333,11 +351,13 @@ namespace EduPortal.Services
                 var accessToken = _token.GenerateAccessToken(user, roles);
                 var refreshToken = _token.GenerateRandomSecureToken();
                 var newAccessToken = tokenHandler.ReadJwtToken(accessToken);
+                var hashedRefreshToken = _token.HashRefreshToken(refreshToken);
 
-                userRefreshToken.RefreshToken = refreshToken;
+                userRefreshToken.RefreshToken = hashedRefreshToken.hash;
+                userRefreshToken.Salt = hashedRefreshToken.salt;
                 userRefreshToken.JwtId = newAccessToken.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Jti)!.ToString();
                 userRefreshToken.CreatedAt = DateTime.Now;
-                userRefreshToken.ExpiresAt = DateTime.Now.AddDays(1);
+                userRefreshToken.ExpiresAt = DateTime.Now.AddDays(1);     // ეს გაასწორე რომ დინამიურად იცვლებოდეს დღე კონფიგურაციის მიხედვით
                 userRefreshToken.RevokedAt = null;
 
                 await _context.SaveChangesAsync();
