@@ -2,6 +2,7 @@
 using EduPortal.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Text;
 
 
 namespace EduPortal.Controllers
@@ -67,16 +68,16 @@ namespace EduPortal.Controllers
             }
 
             Response.Cookies.Append(
-                    "refreshToken",
-                    response.Data!.RefreshToken.ToString(),
-                    new CookieOptions
-                    {
-                        HttpOnly = true,
-                        Secure = true,
-                        SameSite = SameSiteMode.Strict,
-                        Expires = response.Data.RefreshTokenExpireDate
-                    }
-                );
+                "refreshToken",
+                Convert.ToBase64String(response.Data!.RefreshToken),
+                new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.None,
+                    Expires = response.Data.RefreshTokenExpireDate
+                }
+            );
 
             return Ok(response.Data!.AccessToken);
         }
@@ -104,16 +105,19 @@ namespace EduPortal.Controllers
             }
 
             Response.Cookies.Append(
-                   "refreshToken",
-                   response.Data!.RefreshToken.ToString(),
-                   new CookieOptions
-                   {
-                       HttpOnly = true,
-                       Secure = true,
-                       SameSite = SameSiteMode.Strict,
-                       Expires = response.Data.RefreshTokenExpireDate
-                   }
-               );
+                "refreshToken",
+                Convert.ToBase64String(response.Data!.RefreshToken),
+                new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.None,
+                    Expires = response.Data.RefreshTokenExpireDate
+                }
+            );
+
+            var test = Encoding.UTF8.GetString(response.Data!.RefreshToken);
+            var rest = Convert.ToBase64String(response.Data!.RefreshToken);
 
             return Ok(response.Data!.AccessToken);
         }

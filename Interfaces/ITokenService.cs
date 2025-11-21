@@ -9,5 +9,7 @@ namespace EduPortal.Interfaces
         public (byte[] refreshToken, DateTime expires) GenerateRefreshToken(int userId, int? sessionId = null, string? jwtId = null);
 
         public byte[] GenerateRandomSecureToken();
+
+        public (byte[] hash, byte[] salt) HashRefreshToken(byte[] token);
     }
 }
