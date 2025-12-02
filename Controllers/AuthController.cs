@@ -123,7 +123,7 @@ namespace EduPortal.Controllers
         }
 
         [HttpPost("Refresh")]
-        public async Task<IActionResult> Refresh(TokenRequestDTO dto)
+        public async Task<IActionResult> Refresh(string accessToken)
         {
             if (!ModelState.IsValid)
             {
@@ -137,7 +137,9 @@ namespace EduPortal.Controllers
                 return BadRequest(ModelState);
             }
 
-            var response = await _authService.RefreshTokenAsync(dto);
+            var refreshTokenRaw = Request.Cookies["refreshToken"];
+
+            var response = await _authService.RefreshTokenAsync(accessToken, refreshTokenRaw);
 
             if (!response.Success)
             {

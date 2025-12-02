@@ -7,12 +7,10 @@ using EduPortal.Models.HelperClasses;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using Microsoft.AspNetCore.Authorization;
 
 namespace EduPortal.Services
 {
@@ -247,11 +245,11 @@ namespace EduPortal.Services
         }
 
         // needs to be corrected
-        public async Task<ServiceResponse<AuthResultDTO>> RefreshTokenAsync(TokenRequestDTO model)
+        public async Task<ServiceResponse<AuthResultDTO>> RefreshTokenAsync(string accessTokenInput, string refreshTokenRaw)
         {
             var response = new ServiceResponse<AuthResultDTO>();
 
-            if(model is null || model.AccessToken.IsNullOrEmpty() || model.RefreshToken.IsNullOrEmpty())
+            if(string.IsNullOrEmpty(accessTokenInput) || string.IsNullOrEmpty(refreshTokenRaw))
             {
                 await _logger.LogServiceErrorAsync(
                     "1000",
@@ -265,7 +263,7 @@ namespace EduPortal.Services
             }
 
             var jwtSettings = _config.GetSection("JwtSettings");
-            var principal = GetPrincipalFromTokenAsync(model.AccessToken, jwtSettings["Key"]!, false);
+            var principal = GetPrincipalFromTokenAsync(accessTokenInput, jwtSettings["Key"]!, false);
 
             if (principal is null || principal.Identity is null || !principal.Identity.IsAuthenticated)
             {
@@ -309,7 +307,7 @@ namespace EduPortal.Services
             }
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            var jwt = tokenHandler.ReadJwtToken(model.AccessToken);
+            var jwt = tokenHandler.ReadJwtToken(accessTokenInput);
             var jwtId = jwt.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Jti)?.Value;
 
             if (string.IsNullOrEmpty(jwtId))
@@ -319,14 +317,17 @@ namespace EduPortal.Services
 
             var userRefreshToken = await _context.UserTokens.Where(x => x.JwtId == jwtId).OrderByDescending(x => x.CreatedAt).FirstOrDefaultAsync();
 
+            var incomingTokenBytes = Encoding.UTF8.GetBytes(refreshTokenRaw);
 
-            var rawToken = Uri.UnescapeDataString(model.RefreshToken);            
-            var tokenBytes = Encoding.UTF8.GetBytes(rawToken);
-            
             using var hmac = new HMACSHA256(userRefreshToken!.Salt);
-            var incomingHash = hmac.ComputeHash(tokenBytes);
+            byte[] incomingHash = hmac.ComputeHash(incomingTokenBytes);
 
             bool isValidRefreshToken = CryptographicOperations.FixedTimeEquals(incomingHash, userRefreshToken.RefreshToken);
+
+            if (!isValidRefreshToken)
+            {
+                return response.FailResponse("Given refresh token does not match user's refresh token");
+            }
 
             if (!isValidRefreshToken)
             {

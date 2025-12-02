@@ -12,7 +12,7 @@ namespace EduPortal.Interfaces
 
         public Task<ServiceResponse<AuthResultDTO>> LoginAsync(UserLoginDTO model);
 
-        public Task<ServiceResponse<AuthResultDTO>> RefreshTokenAsync(TokenRequestDTO model);
+        public Task<ServiceResponse<AuthResultDTO>> RefreshTokenAsync(string accessToken, string refreshTokenRaw);
 
         public Task<ServiceResponse<bool>> LogoutAsync();
 
