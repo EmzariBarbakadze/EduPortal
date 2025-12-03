@@ -31,8 +31,8 @@ namespace EduPortal.Data
         public DbSet<UsersRoles> UsersRoles { get; set; }
         public DbSet<UsersSessions> UsersSessions { get; set; }
         public DbSet<UserTokens> UserTokens { get; set; }
-
         public DbSet<EmailVerification> EmailVerification { get; set; }
+        public DbSet<CourseLecturers> CourseLecturers { get; set; }
 
 
         // Seed Inf Tables

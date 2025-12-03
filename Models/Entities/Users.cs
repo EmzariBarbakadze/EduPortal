@@ -60,5 +60,7 @@ namespace EduPortal.Models.Entities
         public List<Enrollments> Enrollments { get; set; }
 
         public List<EmailVerification> EmailVerifications { get; set; }
+
+        public List<CourseLecturers> CourseLecuters { get; set; }
     }
 }

@@ -34,5 +34,7 @@ namespace EduPortal.Models.Entities
         public List<Enrollments> Enrollments { get; set; }
 
         public List<CourseSchedule> CourseSchedules { get; set; }
+
+        public List<CourseLecturers> CourseLecturers { get; set; }
     }
 }

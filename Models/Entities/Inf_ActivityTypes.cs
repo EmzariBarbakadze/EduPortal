@@ -14,5 +14,7 @@ namespace EduPortal.Models.Entities
         // ------------------------------------------------
 
         public List<CourseScheduleAttributes> CourseScheduleAttributes { get; set; }
+
+        public List<CourseLecturers> CourseLecturers { get; set; }
     }
 }
