@@ -65,7 +65,7 @@ namespace EduPortal.Services
         {
             var salt = RandomNumberGenerator.GetBytes(32);
             using var hmac = new HMACSHA256(salt);
-            var hashed = hmac.ComputeHash(Encoding.UTF8.GetBytes(token.ToString()!));
+            var hashed = hmac.ComputeHash(token);
 
             return (hashed, salt);
         }

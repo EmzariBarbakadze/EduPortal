@@ -244,7 +244,6 @@ namespace EduPortal.Services
             }
         }
 
-        // needs to be corrected
         public async Task<ServiceResponse<AuthResultDTO>> RefreshTokenAsync(string accessTokenInput, string refreshTokenRaw)
         {
             var response = new ServiceResponse<AuthResultDTO>();
@@ -315,23 +314,29 @@ namespace EduPortal.Services
                 return response.FailResponse("Invalid access token. Missing JTI");
             }
 
-            var userRefreshToken = await _context.UserTokens.Where(x => x.JwtId == jwtId).OrderByDescending(x => x.CreatedAt).FirstOrDefaultAsync();
+            var userRefreshToken = await _context.UserTokens
+                .Where(x => x.JwtId == jwtId)
+                .OrderByDescending(x => x.CreatedAt)
+                .FirstOrDefaultAsync();
 
-            var incomingTokenBytes = Encoding.UTF8.GetBytes(refreshTokenRaw);
+            if (userRefreshToken == null)
+            {
+                return response.FailResponse("Refresh token not found");
+            }
 
-            using var hmac = new HMACSHA256(userRefreshToken!.Salt);
+            byte[] incomingTokenBytes = Convert.FromBase64String(refreshTokenRaw);
+
+            using var hmac = new HMACSHA256(userRefreshToken.Salt);
             byte[] incomingHash = hmac.ComputeHash(incomingTokenBytes);
 
-            bool isValidRefreshToken = CryptographicOperations.FixedTimeEquals(incomingHash, userRefreshToken.RefreshToken);
+            bool isValidRefreshToken = CryptographicOperations.FixedTimeEquals(
+                incomingHash,
+                userRefreshToken.RefreshToken
+            );
 
             if (!isValidRefreshToken)
             {
                 return response.FailResponse("Given refresh token does not match user's refresh token");
-            }
-
-            if (!isValidRefreshToken)
-            {
-                return response.FailResponse("Given refresh token do not match user's refresh token");
             }
 
             if(userRefreshToken.ExpiresAt <= DateTime.Now)
@@ -358,7 +363,7 @@ namespace EduPortal.Services
                 userRefreshToken.Salt = hashedRefreshToken.salt;
                 userRefreshToken.JwtId = newAccessToken.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Jti)!.ToString();
                 userRefreshToken.CreatedAt = DateTime.Now;
-                userRefreshToken.ExpiresAt = DateTime.Now.AddDays(1);     // ეს გაასწორე რომ დინამიურად იცვლებოდეს დღე კონფიგურაციის მიხედვით
+                userRefreshToken.ExpiresAt = DateTime.Now.AddDays(Convert.ToDouble(_config["JwtSettings:RefreshTokenExpiresDays"]));
                 userRefreshToken.RevokedAt = null;
 
                 await _context.SaveChangesAsync();
