@@ -368,7 +368,7 @@ namespace EduPortal.Services
 
                 await _context.SaveChangesAsync();
 
-                return response.SuccessResponse(new AuthResultDTO { AccessToken = accessToken, RefreshToken = refreshToken }, "Token refreshed successfully");
+                return response.SuccessResponse(new AuthResultDTO { AccessToken = accessToken, RefreshToken = refreshToken, RefreshTokenExpireDate = userRefreshToken.ExpiresAt }, "Token refreshed successfully");
             }
             catch(Exception ex)
             {

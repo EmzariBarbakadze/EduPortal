@@ -104,6 +104,8 @@ namespace EduPortal.Controllers
                 return BadRequest(response.Message);
             }
 
+            //Response.Cookies.Delete("refreshToken");
+
             Response.Cookies.Append(
                 "refreshToken",
                 Convert.ToBase64String(response.Data!.RefreshToken),
@@ -115,9 +117,6 @@ namespace EduPortal.Controllers
                     Expires = response.Data.RefreshTokenExpireDate
                 }
             );
-
-            var test = Encoding.UTF8.GetString(response.Data!.RefreshToken);
-            var rest = Convert.ToBase64String(response.Data!.RefreshToken);
 
             return Ok(response.Data!.AccessToken);
         }
@@ -146,7 +145,22 @@ namespace EduPortal.Controllers
                 return BadRequest(response.Message);
             }
 
-            return Ok(response);
+            Response.Cookies.Delete("refreshToken");
+
+            Response.Cookies.Append(
+                "refreshToken",
+                Convert.ToBase64String(response.Data!.RefreshToken),
+                new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.None,
+                    Path = "/",
+                    Expires = response.Data.RefreshTokenExpireDate
+                }
+            );
+
+            return Ok(response.Data!.AccessToken);
         }
 
         [HttpPost("ForgotPassword")]

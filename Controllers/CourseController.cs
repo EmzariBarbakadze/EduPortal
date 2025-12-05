@@ -39,16 +39,32 @@ namespace EduPortal.Controllers
         }
 
         [HttpGet("Get course by id")]
-        public async Task<IActionResult> GetCourseById()
+        public async Task<IActionResult> GetCourseById(int courseId)
         {
-            return default;
+            var response = await _service.GetCourseById(courseId);
+
+            if (!response.Success)
+            {
+                await _logger.LogServiceErrorAsync(
+                  "0000",
+                  "Error from GetCourseById service",
+                  "Controller",
+                  "GetCourseById",
+                  null
+                );
+                return BadRequest(response.Message);
+            }
+
+            return Ok(response);
         }
 
         [HttpPost("Add course")]
         [Authorize(Roles = "Lecturer,Admin,SuperAdmin")]
         public async Task<IActionResult> AddCourse()
         {
-            return default;
+            var userClaim = User.FindFirst("sub")!.Value;
+
+            return Ok(userClaim);
         }
 
         [HttpPut("Edit course")]

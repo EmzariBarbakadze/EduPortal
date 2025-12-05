@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Identity;
 using EduPortal.Models.Entities;
 using Microsoft.OpenApi.Models;
 using System.IdentityModel.Tokens.Jwt;
+using EduPortal.RepositoryInterfaces;
+using EduPortal.Repositories;
 
 namespace EduPortal
 {
@@ -97,6 +99,8 @@ namespace EduPortal
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IErrorLogger, ErrorLogger>();
+            builder.Services.AddScoped<ICourseService, CourseService>();
+            builder.Services.AddScoped<ICourseRepository, CourseRepository>();
 
             var app = builder.Build();
 

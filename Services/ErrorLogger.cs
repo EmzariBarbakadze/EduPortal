@@ -15,6 +15,10 @@ namespace EduPortal.Services
 
         public async Task LogExceptionAsync(Exception ex, string? path = null, int? userId = null)
         {
+
+            if (userId == 0)
+                userId = null;
+
             var log = new ExceptionLogs
             {
                 Code = "0000",        // Check information table of codes. 

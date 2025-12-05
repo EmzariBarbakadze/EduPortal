@@ -23,10 +23,25 @@ namespace EduPortal.Services
 
             if (result.IsNullOrEmpty())
             {
-                return response.FailResponse("Repository returned null or empty value");
+                return response.FailResponse("No course found");
             }
 
             return response.SuccessResponse(result, "Courses successfully found");
+        }
+
+        public async Task<ServiceResponse<CourseSelDTO>> GetCourseById(int courseId)
+        {
+            var response = new ServiceResponse<CourseSelDTO>();
+
+            if (courseId <= 0)
+                response.FailResponse("Given id can not be less or equal to zero");
+
+            response.Data = await _repository.GetCourseById(courseId);
+
+            if (response.Data == null || !response.Success)
+                return response.FailResponse("No course with given id found");
+
+            return response;
         }
     }
 }

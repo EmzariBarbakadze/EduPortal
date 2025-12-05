@@ -6,5 +6,7 @@ namespace EduPortal.Interfaces
     public interface ICourseService
     {
         public Task<ServiceResponse<List<CourseSelDTO>>> GetAllCourses();
+
+        public Task<ServiceResponse<CourseSelDTO>> GetCourseById(int courseId);
     }
 }
