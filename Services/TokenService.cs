@@ -79,14 +79,9 @@ namespace EduPortal.Services
             var userToken = new UserTokens
             {
                 UserId = userId,
-<<<<<<< HEAD
-                RefreshToken = HashRefreshToken(refreshToken).hash,
-                JwtId = jwtId!,
-=======
                 RefreshToken = hashedRefreshToken.hash,
                 Salt = hashedRefreshToken.salt,
                 JwtId = jwtId,
->>>>>>> 81136f55bb98b6c96e3dc866f32de7886a9f4753
                 CreatedAt = DateTime.Now,
                 ExpiresAt = DateTime.Now.AddDays(double.Parse(config["RefreshTokenExpiresDays"]!)),
                 SessionId = sessionId
