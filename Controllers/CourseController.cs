@@ -1,4 +1,6 @@
 ﻿using EduPortal.Interfaces;
+using EduPortal.Models.DTOs;
+using EduPortal.Models.Entities;
 using EduPortal.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +17,7 @@ namespace EduPortal.Controllers
         public CourseController(ICourseService service, IErrorLogger logger)
         {
             _service = service;
-            _logger = logger;
+            _logger = logger; 
         }
 
         [HttpGet("Get all courses")]
@@ -60,9 +62,25 @@ namespace EduPortal.Controllers
 
         [HttpPost("Add course")]
         [Authorize(Roles = "Lecturer,Admin,SuperAdmin")]
-        public async Task<IActionResult> AddCourse()
+        public async Task<IActionResult> AddCourse(AddCourseDTO dto)
         {
-            var userClaim = User.FindFirst("sub")!.Value;
+            var userId = Convert.ToInt32(User.FindFirst("sub")!.Value);
+
+            var response = await _service.AddCourse(dto, userId);
+
+            if (!response.Success)
+            {
+                await _logger.LogServiceErrorAsync(
+                  "0000",
+                  "Error from AddCourse service",
+                  "Controller",
+                  "AddCourse",
+                  null
+                );
+                return BadRequest(response.Message);
+            }
+
+            return Ok(response);
 
             return Ok(userClaim);
         }

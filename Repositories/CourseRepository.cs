@@ -18,6 +18,36 @@ namespace EduPortal.Repositories
             _connectionString = config.GetConnectionString("DefaultConnection")!;
         }
 
+        public async Task<bool> AddCourse(AddCourseDTO dto, int userId)
+        {
+            using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+
+            var parameters = new DynamicParameters();
+            parameters.Add("@TitleLocal", dto.TitleLocal);
+            parameters.Add("@TitleEng", dto.TitleEng);
+            parameters.Add("@DescrLocal", dto.DescrLocal);
+            parameters.Add("@DesctEng", dto.DescrEng);
+            parameters.Add("@CourseCategoryId", dto.CourseCategoryId);
+            parameters.Add("@UserId", userId);
+            parameters.Add("@IsActive", dto.IsActive);
+
+            try
+            {
+                await connection.ExecuteAsync(
+                    "dbo.Edu_AddCourse",
+                    parameters,
+                    commandType: CommandType.StoredProcedure
+                );
+            }
+            catch
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         public async Task<List<CourseSelDTO>> GetAllCourses()
         {
             using var connection = new SqlConnection(_connectionString);

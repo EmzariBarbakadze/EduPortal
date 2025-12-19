@@ -3,6 +3,7 @@ using EduPortal.Models.DTOs;
 using EduPortal.Models.HelperClasses;
 using EduPortal.RepositoryInterfaces;
 using Microsoft.IdentityModel.Tokens;
+using System.Runtime.InteropServices;
 
 namespace EduPortal.Services
 {
@@ -13,6 +14,15 @@ namespace EduPortal.Services
         public CourseService(ICourseRepository repository)
         {
             _repository = repository;
+        }
+
+        public async Task<ServiceResponse<bool>> AddCourse(AddCourseDTO dto, int userId)
+        {
+            var response = new ServiceResponse<bool>();
+
+            //var result = await 
+
+
         }
 
         public async Task<ServiceResponse<List<CourseSelDTO>>> GetAllCourses()

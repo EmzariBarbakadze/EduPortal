@@ -67,16 +67,16 @@ namespace EduPortal.Controllers
                 return BadRequest(response.Message);
             }
 
+            Response.Cookies.Delete("refresh_token", new CookieOptions
+            {   
+                Secure = true,
+                Path = "/"
+            });
+
             Response.Cookies.Append(
-                "refreshToken",
+                "refresh_token",
                 Convert.ToBase64String(response.Data!.RefreshToken),
-                new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = true,
-                    SameSite = SameSiteMode.None,
-                    Expires = response.Data.RefreshTokenExpireDate
-                }
+                RefreshTokenCookieOptions(response.Data.RefreshTokenExpireDate)
             );
 
             return Ok(response.Data!.AccessToken);
@@ -104,18 +104,16 @@ namespace EduPortal.Controllers
                 return BadRequest(response.Message);
             }
 
-            //Response.Cookies.Delete("refreshToken");
+            Response.Cookies.Delete("refresh_token", new CookieOptions
+            {
+                Secure = true,
+                Path = "/"
+            });
 
             Response.Cookies.Append(
-                "refreshToken",
+                "refresh_token",
                 Convert.ToBase64String(response.Data!.RefreshToken),
-                new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = true,
-                    SameSite = SameSiteMode.None,
-                    Expires = response.Data.RefreshTokenExpireDate
-                }
+                RefreshTokenCookieOptions(response.Data.RefreshTokenExpireDate)
             );
 
             return Ok(response.Data!.AccessToken);
@@ -136,7 +134,7 @@ namespace EduPortal.Controllers
                 return BadRequest(ModelState);
             }
 
-            var refreshTokenRaw = Request.Cookies["refreshToken"];
+            var refreshTokenRaw = Request.Cookies["refresh_token"];
 
             var response = await _authService.RefreshTokenAsync(accessToken, refreshTokenRaw);
 
@@ -145,19 +143,16 @@ namespace EduPortal.Controllers
                 return BadRequest(response.Message);
             }
 
-            Response.Cookies.Delete("refreshToken");
+            Response.Cookies.Delete("refresh_token", new CookieOptions
+            {
+                Secure = true,
+                Path = "/"
+            });
 
             Response.Cookies.Append(
-                "refreshToken",
+                "refresh_token",
                 Convert.ToBase64String(response.Data!.RefreshToken),
-                new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = true,
-                    SameSite = SameSiteMode.None,
-                    Path = "/",
-                    Expires = response.Data.RefreshTokenExpireDate
-                }
+                RefreshTokenCookieOptions(response.Data.RefreshTokenExpireDate)
             );
 
             return Ok(response.Data!.AccessToken);
@@ -238,7 +233,7 @@ namespace EduPortal.Controllers
         }
 
         [Authorize]
-        [HttpGet("Me")]  // Needs parameters define the flow first
+        [HttpGet("Me")] 
         public async Task<IActionResult> Me()
         {
             var response = await _authService.MeAsync();
@@ -257,5 +252,20 @@ namespace EduPortal.Controllers
 
             return Ok(response);
         }
+
+
+
+        private static CookieOptions RefreshTokenCookieOptions(DateTime expires)
+        {
+            return new CookieOptions
+            {
+                HttpOnly = false,
+                Secure = true,               
+                SameSite = SameSiteMode.Lax,
+                Path = "/",
+                Expires = expires
+            };
+        }
+
     }
 }
