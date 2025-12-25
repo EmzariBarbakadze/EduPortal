@@ -20,9 +20,16 @@ namespace EduPortal.Services
         {
             var response = new ServiceResponse<bool>();
 
-            //var result = await 
+            var result = await _repository.AddCourse(dto, userId);
 
-
+            if (result)
+            {
+                return response.SuccessResponse(true, "Course succesfully added");
+            }
+            else
+            {
+                return response.FailResponse("Course could not be added. contact to application support!");
+            }
         }
 
         public async Task<ServiceResponse<List<CourseSelDTO>>> GetAllCourses()

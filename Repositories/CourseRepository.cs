@@ -27,7 +27,7 @@ namespace EduPortal.Repositories
             parameters.Add("@TitleLocal", dto.TitleLocal);
             parameters.Add("@TitleEng", dto.TitleEng);
             parameters.Add("@DescrLocal", dto.DescrLocal);
-            parameters.Add("@DesctEng", dto.DescrEng);
+            parameters.Add("@DescrEng", dto.DescrEng);
             parameters.Add("@CourseCategoryId", dto.CourseCategoryId);
             parameters.Add("@UserId", userId);
             parameters.Add("@IsActive", dto.IsActive);
