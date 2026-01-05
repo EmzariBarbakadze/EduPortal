@@ -68,9 +68,8 @@ namespace EduPortal.Controllers
             }
 
             Response.Cookies.Delete("refresh_token", new CookieOptions
-            {   
-                Secure = true,
-                Path = "/"
+            {
+                Path = "/api/auth"
             });
 
             Response.Cookies.Append(
@@ -79,7 +78,10 @@ namespace EduPortal.Controllers
                 RefreshTokenCookieOptions(response.Data.RefreshTokenExpireDate)
             );
 
-            return Ok(response.Data!.AccessToken);
+            return Ok(new
+            {
+                accessToken = response.Data.AccessToken
+            });
         }
 
         [HttpPost("Login")]
@@ -106,8 +108,7 @@ namespace EduPortal.Controllers
 
             Response.Cookies.Delete("refresh_token", new CookieOptions
             {
-                Secure = true,
-                Path = "/"
+                Path = "/api/auth"
             });
 
             Response.Cookies.Append(
@@ -116,7 +117,10 @@ namespace EduPortal.Controllers
                 RefreshTokenCookieOptions(response.Data.RefreshTokenExpireDate)
             );
 
-            return Ok(response.Data!.AccessToken);
+            return Ok(new
+            {
+                accessToken = response.Data.AccessToken
+            });
         }
 
         [HttpPost("Refresh")]
@@ -145,8 +149,7 @@ namespace EduPortal.Controllers
 
             Response.Cookies.Delete("refresh_token", new CookieOptions
             {
-                Secure = true,
-                Path = "/"
+                Path = "/api/auth"
             });
 
             Response.Cookies.Append(
@@ -155,7 +158,10 @@ namespace EduPortal.Controllers
                 RefreshTokenCookieOptions(response.Data.RefreshTokenExpireDate)
             );
 
-            return Ok(response.Data!.AccessToken);
+            return Ok(new
+            {
+                accessToken = response.Data.AccessToken
+            });
         }
 
         [HttpPost("ForgotPassword")]
@@ -259,10 +265,10 @@ namespace EduPortal.Controllers
         {
             return new CookieOptions
             {
-                HttpOnly = false,
-                Secure = true,               
-                SameSite = SameSiteMode.Lax,
-                Path = "/",
+                HttpOnly = true,              
+                Secure = true,                
+                SameSite = SameSiteMode.Strict,
+                Path = "/api/auth",           
                 Expires = expires
             };
         }

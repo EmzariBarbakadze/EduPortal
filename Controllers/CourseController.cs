@@ -4,6 +4,7 @@ using EduPortal.Models.Entities;
 using EduPortal.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace EduPortal.Controllers
 {
@@ -64,7 +65,7 @@ namespace EduPortal.Controllers
         [Authorize(Roles = "Lecturer,Admin,SuperAdmin")]
         public async Task<IActionResult> AddCourse(AddCourseDTO dto)
         {
-            var userId = Convert.ToInt32(User.FindFirst("sub")!.Value);
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
             var response = await _service.AddCourse(dto, userId);
 
