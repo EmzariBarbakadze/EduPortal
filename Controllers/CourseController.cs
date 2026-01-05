@@ -81,8 +81,6 @@ namespace EduPortal.Controllers
             }
 
             return Ok(response);
-
-            return Ok(userClaim);
         }
 
         [HttpPut("Edit course")]
